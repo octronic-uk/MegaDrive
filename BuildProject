@@ -1,0 +1,40 @@
+#!/bin/bash
+
+PROJECT=$1
+
+# File Extensions
+_ASM_EXT=asm
+_MD_ROM_EXT=bin
+_FLAGS="-no-opt -nosym -Fbin"
+
+echo "Building ${PROJECT}"
+
+cd ${PROJECT}
+
+if [[ $? != 0 ]]; then
+    echo "Unable to find project: ${PROJECT}"
+    exit 1
+fi
+    
+rm -rfv *.${_MD_ROM_EXT}
+
+vasmm68k-mot ${_FLAGS} \
+    -o ${PROJECT}.${_MD_ROM_EXT} \
+    ${PROJECT}.${_ASM_EXT}
+
+if [[ $? == 0 ]]; then
+
+    echo "Build Succeeded! :D"
+    echo "Running 'file' on " ${PROJECT}.${_MD_ROM_EXT}
+
+    file ${PROJECT}.${_MD_ROM_EXT}
+
+    echo "Run (Y/N): "
+    read run_ans
+
+    if [[ ${run_ans} == "Y" || ${run_ans} == "y" ]]; then
+        open ${PROJECT}.${_MD_ROM_EXT}
+    fi
+else
+    echo "Build Failed :("
+fi
