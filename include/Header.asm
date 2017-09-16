@@ -17,15 +17,15 @@ SRAM_END        equ $00000000
 RESET_BUTTON    equ $00A1000C
 RESET_AUX       equ $00A10008
 HW_VERSION      equ $00A10001
-SEGA_STR        equ 'SEGA'
 TMSS_SIG        equ $00A14000
-CTRL_PORT_1     equ $000A10009      
-CTRL_PORT_2     equ $000A1000B      
-CTRL_PORT_EXP   equ $000A1000D    
+CTRL_PORT_1     equ $00A10009      
+CTRL_PORT_2     equ $00A1000B      
+CTRL_PORT_EXP   equ $00A1000D    
+SEGA_STR        equ 'SEGA'
 
-    include "../include/VDPConstants.asm"
-    include "../include/Z80Constants.asm"
-    include "../include/PSGConstants.asm"
+    include "../include/constants/VDPConstants.asm"
+    include "../include/constants/Z80Constants.asm"
+    include "../include/constants/PSGConstants.asm"
 
 ; Exception Table --------------------------------------------------------------
 	dc.l   INITIAL_SP      ; Initial stack pointer value
@@ -183,7 +183,8 @@ _ControllerInit:                ; Set IN I/O direction, interrupts off, on all p
 _InitCleanup:
     move.l  #$00000000,a0       ; Move 0x0 to a0
     movem.l (a0),d0-d7/a1-a7    ; Multiple move 0 to all registers
-    move    #$2700,sr           ; Init status register (no trace, A7 is Interrupt Stack 
+    move    #$1700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits) 
+
 Main:
     jmp __GameMain
 
@@ -211,6 +212,7 @@ Z80Data:
     dc.w $f3ed, $5636
     dc.w $e9e9, $8104
     dc.w $8f01
+
 ; PSG Sample Program -----------------------------------------------------------
 PSGData:
    dc.w $9fbf, $dfff

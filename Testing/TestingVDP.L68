@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.15.04
-Created On: 15/09/2017 22:25:04
+Created On: 16/09/2017 23:13:13
 
 00000000                             1  ;  ______   ______   __  __
 00000000                             2  ; /\  __ \ /\  ___\ /\ \_\ \
@@ -12,137 +12,190 @@ Created On: 15/09/2017 22:25:04
 00000000                             8  ; TestingVDP.asm - Testing Useful VDP Definitions
 00000000                             9  ;
 00000000                            10  
-00000000  =00000011                 11  TEST_REGISTER       equ $11
-00000000  =000000DA                 12  TEST_DATA           equ $DA
-00000000  =000091DA                 13  TEST_REG_EXPECTED   equ $91DA 
-00000000  =0000B00B                 14  TEST_STATUS_VALUE   equ $B00B
-00000000  =00008F02                 15  TEST_AI_EXPECTED    equ $8F02
-00000000                            16   
-00000000                            17      ;public start    ;Make the entry point public
-00001000                            18      org $1000       ;Place the origin at $2000
-00001000                            19  
-00001000                            20  start:
-00001000  2F3C 00000011             21      move.l  #TEST_REGISTER,-(sp)
-00001006  2F3C 000000DA             22      move.l  #TEST_DATA,-(sp)
-0000100C  4EB9 00001078             23      jsr     _VDPWriteRegister
-00001012  508F                      24      addq.l  #8,sp
-00001014                            25      
-00001014  0C79 91DA 00C00004        26      cmpi.w  #TEST_REG_EXPECTED,VDP_CTRL_PORT
-0000101C  6600 0030                 27      bne     _TestFailed
-00001020                            28      
-00001020  33FC B00B 00C00004        29      move.w  #TEST_STATUS_VALUE,VDP_CTRL_PORT
-00001028  4EB9 00001050             30      jsr     _VDPReadStatusIntoD0
-0000102E                            31      
-0000102E  0C40 B00B                 32      cmpi.w  #TEST_STATUS_VALUE,d0
-00001032  6600 001A                 33      bne     _TestFailed
-00001036                            34      
-00001036  2F3C 00000002             35      move.l  #2,-(sp)
-0000103C  4EB9 00001064             36      jsr     _VDPSetAutoIncrement
-00001042  588F                      37      addq.l  #4,sp
-00001044                            38      
-00001044  0C79 8F02 00C00004        39      cmpi.w  #TEST_AI_EXPECTED,VDP_CTRL_PORT
-0000104C                            40      
-0000104C                            41      
-0000104C                            42  _TestingComplete:
-0000104C  60FE                      43      bra _TestingComplete
-0000104E                            44  
-0000104E                            45  
-0000104E                            46  _TestFailed:
-0000104E  60FE                      47      bra _TestFailed
-00001050                            48      
-00001050                            49      include "../include/VDP.asm"
-00001050                            50  ;  ______   ______   __  __
-00001050                            51  ; /\  __ \ /\  ___\ /\ \_\ \
-00001050                            52  ; \ \  __ \\ \___  \\ \  __ \
-00001050                            53  ;  \ \_\ \_\\/\_____\\ \_\ \_\
-00001050                            54  ;   \/_/\/_/ \/_____/ \/_/\/_/
-00001050                            55  ;      ash@octronic.co.uk
-00001050                            56  ;
-00001050                            57  ; VDP.asm - Useful VDP Definitions
-00001050                            58  ;
-00001050                            59  ;   See http://md.squee.co/VDP
-00001050                            60  ;
-00001050                            61  
-00001050  =00C00000                 62  VDP_DATA_PORT           equ $00C00000
-00001050  =00C00004                 63  VDP_CTRL_PORT           equ $00C00004
-00001050  =00C00008                 64  VDP_HV_COUNTER          equ $00C00008
-00001050  =00C00011                 65  VDP_SN76489_PSG         equ $00C00011
-00001050                            66  
-00001050                            67  
-00001050  =00000000                 68  VDPREG_MODE_1                   equ $00
-00001050  =00000001                 69  VDPREG_MODE_2                   equ $01
-00001050  =00000002                 70  VDPREG_PLN_A_NAME_TBL_LOC       equ $02
-00001050  =00000003                 71  VDPREG_WINDOW_NAME_TBL_LOC      equ $03
-00001050  =00000004                 72  VDPREG_PLN_B_NAME_TBL_LOC       equ $04
-00001050  =00000005                 73  VDPREG_SPRITE_TBL_LOC           equ $05
-00001050  =00000006                 74  VDPREG_SPRITE_PTN_GEN_BASE_ADDR equ $06
-00001050  =00000007                 75  VDPREG_BG_COLOUR                equ $07
-00001050  =00000008                 76  VDPREG_UNUSED_1                 equ $08
-00001050  =00000009                 77  VDPREG_UNUSED_2                 equ $09
-00001050  =0000000A                 78  VDPREG_H_INT_CNTR               equ $0A
-00001050  =0000000B                 79  VDPREG_MODE_REG_3               equ $0B
-00001050  =0000000C                 80  VDPREG_MODE_REG_4               equ $0C
-00001050  =0000000D                 81  VDPREG_H_SCROLL_DATA_LOC        equ $0D
-00001050  =0000000E                 82  VDPREG_NAME_TBL_PTRN_GEN_BASE   equ $0E
-00001050  =0000000F                 83  VDPREG_AUTO_INCREMENT           equ $0F
-00001050  =00000010                 84  VDPREG_PLANE_SIZE               equ $10
-00001050  =00000011                 85  VDPREG_WINDOW_PLANE_H_POS       equ $11
-00001050  =00000012                 86  VDPREG_WINDOW_PLANE_V_POS       equ $12
-00001050  =00000013                 87  VDPREG_DMA_LENGTH_1             equ $13
-00001050  =00000014                 88  VDPREG_DMA_LENGTH_2             equ $14
-00001050  =00000015                 89  VDPREG_DMA_SRC_1                equ $15
-00001050  =00000016                 90  VDPREG_DMA_SRC_2                equ $16
-00001050  =00000017                 91  VDPREG_DMA_SRC_3                equ $17
-00001050                            92  
-00001050                            93  _VDPReadStatusIntoD0:
-00001050  0280 00000000             94      andi.l  #00000000,d0
-00001056  3039 00C00004             95      move.w  VDP_CTRL_PORT,d0
-0000105C  4E75                      96      rts
-0000105E                            97  
-0000105E                            98  _VDPDisplayEnablePAL:
-0000105E  4E75                      99      rts
-00001060                           100  
-00001060                           101  _VDPDisplayDisable:
-00001060  4E75                     102      rts
-00001062                           103  
-00001062                           104  _VDPSetDisplayMode:
-00001062  4E75                     105      rts
-00001064                           106  
-00001064                           107  ; VDP Set Auto Increment Value
-00001064                           108  ;   move.l #AI_VALUE,-(sp) 
-00001064                           109  ;   jsr _VDPSetAutoIncrement
-00001064                           110  _VDPSetAutoIncrement:
-00001064  2F3C 0000000F            111      move.l   #VDPREG_AUTO_INCREMENT,-(sp)   ; AI Register
-0000106A  2F2F 0008                112      move.l   8(sp),-(sp) ; AI Value ( 8(sp) as we jump over return address)
-0000106E  4EB9 00001078            113      jsr _VDPWriteRegister
-00001074  508F                     114      addq.l   #8,sp
-00001076  4E75                     115      rts
-00001078                           116  
-00001078                           117  ; VDP Write Register
-00001078                           118  ;
-00001078                           119  ; Data Format
-00001078                           120  ;   1, 0, ?, R4,R3,R2,R1,R0
-00001078                           121  ;   D7,D6,D5,D4,D3,D2,D1,D0
-00001078                           122  ; Usage
-00001078                           123  ;    move.l #register,-(sp)
-00001078                           124  ;    move.l #data,-(sp)
-00001078                           125  ;
-00001078                           126  _VDPWriteRegister:
-00001078  202F 0004                127      move.l  4(sp),d0           ; VDP Data
-0000107C  222F 0008                128      move.l  8(sp),d1           ; VDP Register
-00001080  0001 0080                129      ori.b   #$80,d1            ; Register mask
-00001084  E149                     130      lsl     #8,d1              ; Shift to byte 2
-00001086  8041                     131      or.w    d1,d0              ; Or Register with Data
-00001088  33C0 00C00004            132      move.w  d0,VDP_CTRL_PORT   ; Write to VDP
-0000108E  4E75                     133      rts
-0000108E  4E75                     134  -------------------- end include --------------------
-00001090                           135      
-00C00000                           136      org $00C00000
-00C00000                           137  __FAKE_VDP:
-00C00000                           138      ds.b    1024
-00C00400                           139      
-00C00400  FFFF FFFF                140      SIMHALT
-00C00404                           141      END start
+00000000  =00000011                 11  TEST_REGISTER           equ $11
+00000000  =000000DA                 12  TEST_DATA               equ $DA
+00000000  =000091DA                 13  TEST_REG_EXPECTED       equ $91DA 
+00000000  =0000B00B                 14  TEST_STATUS_VALUE       equ $B00B
+00000000  =00008F02                 15  TEST_AI_EXPECTED        equ $8F02
+00000000  =02360061                 16  TEST_CMD_WORD_EXPECTED  equ $02360061
+00000000  =00000018                 17  TEST_CMD_COMMAND        equ $18
+00000000  =00004236                 18  TEST_CMD_ADDRESS        equ $4236
+00000000                            19  
+00000000                            20      include "../include/constants/VDPConstants.asm"
+00000000                            21  ;  ______   ______   __  __
+00000000                            22  ; /\  __ \ /\  ___\ /\ \_\ \
+00000000                            23  ; \ \  __ \\ \___  \\ \  __ \
+00000000                            24  ;  \ \_\ \_\\/\_____\\ \_\ \_\
+00000000                            25  ;   \/_/\/_/ \/_____/ \/_/\/_/
+00000000                            26  ;      ash@octronic.co.uk
+00000000                            27  ;
+00000000                            28  ; VDPConstants.asm - Useful VDP Definitions
+00000000                            29  ;
+00000000                            30  ;   See http://md.squee.co/VDP
+00000000                            31  ;
+00000000                            32  
+00000000  =00C00000                 33  VDP_DATA_PORT           equ $00C00000
+00000000  =00C00004                 34  VDP_CTRL_PORT           equ $00C00004
+00000000  =00C00008                 35  VDP_HV_COUNTER          equ $00C00008
+00000000  =00C00011                 36  VDP_SN76489_PSG         equ $00C00011
+00000000                            37  
+00000000  =00000000                 38  VDPREG_MODE_1                   equ $00
+00000000  =00000001                 39  VDPREG_MODE_2                   equ $01
+00000000  =00000002                 40  VDPREG_PLN_A_NAME_TBL_LOC       equ $02
+00000000  =00000003                 41  VDPREG_WINDOW_NAME_TBL_LOC      equ $03
+00000000  =00000004                 42  VDPREG_PLN_B_NAME_TBL_LOC       equ $04
+00000000  =00000005                 43  VDPREG_SPRITE_TBL_LOC           equ $05
+00000000  =00000006                 44  VDPREG_SPRITE_PTN_GEN_BASE_ADDR equ $06
+00000000  =00000007                 45  VDPREG_BG_COLOUR                equ $07
+00000000  =00000008                 46  VDPREG_UNUSED_1                 equ $08
+00000000  =00000009                 47  VDPREG_UNUSED_2                 equ $09
+00000000  =0000000A                 48  VDPREG_H_INT_CNTR               equ $0A
+00000000  =0000000B                 49  VDPREG_MODE_REG_3               equ $0B
+00000000  =0000000C                 50  VDPREG_MODE_REG_4               equ $0C
+00000000  =0000000D                 51  VDPREG_H_SCROLL_DATA_LOC        equ $0D
+00000000  =0000000E                 52  VDPREG_NAME_TBL_PTRN_GEN_BASE   equ $0E
+00000000  =0000000F                 53  VDPREG_AUTO_INCREMENT           equ $0F
+00000000  =00000010                 54  VDPREG_PLANE_SIZE               equ $10
+00000000  =00000011                 55  VDPREG_WINDOW_PLANE_H_POS       equ $11
+00000000  =00000012                 56  VDPREG_WINDOW_PLANE_V_POS       equ $12
+00000000  =00000013                 57  VDPREG_DMA_LENGTH_1             equ $13
+00000000  =00000014                 58  VDPREG_DMA_LENGTH_2             equ $14
+00000000  =00000015                 59  VDPREG_DMA_SRC_1                equ $15
+00000000  =00000016                 60  VDPREG_DMA_SRC_2                equ $16
+00000000  =00000017                 61  VDPREG_DMA_SRC_3                equ $17
+00000000                            62  
+00000000                            63  -------------------- end include --------------------
+00000000                            64  
+00001000                            65      org $1000   ;Place the origin at $2000
+00001000                            66      
+00001000                            67  start:
+00001000                            68  
+00001000                            69  
+00001000                            70  Test_VDPCreateCmdWord:
+00001000  2F3C 00000018             71      move.l  #TEST_CMD_COMMAND,-(sp)
+00001006  2F3C 00004236             72      move.l  #TEST_CMD_ADDRESS,-(sp)
+0000100C  4EB9 000010AE             73      jsr     _VDPCreateCmdWord
+00001012  508F                      74      addq.l  #8,sp
+00001014  0C80 02360061             75      cmpi.l  #TEST_CMD_WORD_EXPECTED,d0
+0000101A  6600 0050                 76      bne     _TestFailed
+0000101E                            77  
+0000101E                            78  Test_VDPWriteRegister:
+0000101E  2F3C 00000011             79      move.l  #TEST_REGISTER,-(sp)
+00001024  2F3C 000000DA             80      move.l  #TEST_DATA,-(sp)
+0000102A  4EB9 00001096             81      jsr     _VDPWriteRegister
+00001030  508F                      82      addq.l  #8,sp
+00001032  0C79 91DA 00C00004        83      cmpi.w  #TEST_REG_EXPECTED,VDP_CTRL_PORT
+0000103A  6600 0030                 84      bne     _TestFailed
+0000103E                            85      
+0000103E                            86  Test_VDPReadStatusIntoD0:
+0000103E  33FC B00B 00C00004        87      move.w  #TEST_STATUS_VALUE,VDP_CTRL_PORT
+00001046  4EB9 0000106E             88      jsr     _VDPReadStatusIntoD0
+0000104C  0C40 B00B                 89      cmpi.w  #TEST_STATUS_VALUE,d0
+00001050  6600 001A                 90      bne     _TestFailed
+00001054                            91      
+00001054                            92  Test_VDPSetAutoIncrement:
+00001054  2F3C 00000002             93      move.l  #2,-(sp)
+0000105A  4EB9 00001082             94      jsr     _VDPSetAutoIncrement
+00001060  588F                      95      addq.l  #4,sp
+00001062  0C79 8F02 00C00004        96      cmpi.w  #TEST_AI_EXPECTED,VDP_CTRL_PORT
+0000106A                            97      
+0000106A                            98  _TestingComplete:
+0000106A  60FE                      99      bra _TestingComplete
+0000106C                           100  
+0000106C                           101  
+0000106C                           102  _TestFailed:
+0000106C  60FE                     103      bra _TestFailed
+0000106E                           104      
+0000106E                           105      include "../include/VDP.asm"
+0000106E                           106  ;  ______   ______   __  __
+0000106E                           107  ; /\  __ \ /\  ___\ /\ \_\ \
+0000106E                           108  ; \ \  __ \\ \___  \\ \  __ \
+0000106E                           109  ;  \ \_\ \_\\/\_____\\ \_\ \_\
+0000106E                           110  ;   \/_/\/_/ \/_____/ \/_/\/_/
+0000106E                           111  ;      ash@octronic.co.uk
+0000106E                           112  ;
+0000106E                           113  ; VDP.asm - Useful VDP Definitions
+0000106E                           114  ;
+0000106E                           115  ;   See http://md.squee.co/VDP
+0000106E                           116  ;
+0000106E                           117  
+0000106E                           118  _VDPReadStatusIntoD0:
+0000106E  0280 00000000            119      andi.l  #00000000,d0
+00001074  3039 00C00004            120      move.w  VDP_CTRL_PORT,d0
+0000107A  4E75                     121      rts
+0000107C                           122  
+0000107C                           123  _VDPDisplayEnablePAL:
+0000107C  4E75                     124      rts
+0000107E                           125  
+0000107E                           126  _VDPDisplayDisable:
+0000107E  4E75                     127      rts
+00001080                           128  
+00001080                           129  _VDPSetDisplayMode:
+00001080  4E75                     130      rts
+00001082                           131  
+00001082                           132  ; VDP Set Auto Increment Value
+00001082                           133  ;   move.l #AI_VALUE,-(sp) 
+00001082                           134  ;   jsr _VDPSetAutoIncrement
+00001082                           135  _VDPSetAutoIncrement:
+00001082  2F3C 0000000F            136      move.l   #VDPREG_AUTO_INCREMENT,-(sp)   ; AI Register
+00001088  2F2F 0008                137      move.l   8(sp),-(sp) ; AI Value ( 8(sp) as we jump over return address)
+0000108C  4EB9 00001096            138      jsr _VDPWriteRegister
+00001092  508F                     139      addq.l   #8,sp
+00001094  4E75                     140      rts
+00001096                           141  
+00001096                           142  ; VDP Write Register
+00001096                           143  ;
+00001096                           144  ; Data Format
+00001096                           145  ;   1, 0, ?, R4,R3,R2,R1,R0
+00001096                           146  ;   D7,D6,D5,D4,D3,D2,D1,D0
+00001096                           147  ; Usage
+00001096                           148  ;    move.l #register,-(sp)
+00001096                           149  ;    move.l #data,-(sp)
+00001096                           150  ;
+00001096                           151  _VDPWriteRegister:
+00001096  202F 0004                152      move.l  4(sp),d0           ; VDP Data
+0000109A  222F 0008                153      move.l  8(sp),d1           ; VDP Register
+0000109E  0001 0080                154      ori.b   #$80,d1            ; Register mask
+000010A2  E149                     155      lsl     #8,d1              ; Shift to byte 2
+000010A4  8041                     156      or.w    d1,d0              ; Or Register with Data
+000010A6  33C0 00C00004            157      move.w  d0,VDP_CTRL_PORT   ; Write to VDP
+000010AC  4E75                     158      rts
+000010AE                           159  
+000010AE                           160  ; Calculates the correct command word for RAM access
+000010AE                           161  ;   move.l  #Command,-(sp)
+000010AE                           162  ;   move.l  #Address,-(sp)
+000010AE                           163  ;   jsr     _VDPCreateCmdWord
+000010AE                           164  ;   addi.l  #8,sp
+000010AE                           165  ;   
+000010AE                           166  ;   Result in d0
+000010AE                           167  _VDPCreateCmdWord:
+000010AE                           168      ; Store Args
+000010AE  202F 0004                169      move.l  4(sp),d0        ; Address in d0
+000010B2  222F 0008                170      move.l  8(sp),d1        ; Command in d1
+000010B6                           171      ; Format Adderss
+000010B6  4840                     172      swap    d0              ; Move address to upper word
+000010B8  2400                     173      move.l  d0,d2           ; Temporarily store in d2
+000010BA  E59A                     174      rol.l   #2,d2           ; Shift bits 31,30 into 1,0
+000010BC  0280 3FFF0000            175      andi.l  #$3FFF0000,d0   ; zero out bits 31,30
+000010C2  0282 00000003            176      andi.l  #00000003,d2    ; Zero out every other bit 
+000010C8  8082                     177      or.l   d2,d0           ; & result to get address layout
+000010CA                           178      ; Format Command
+000010CA  2401                     179      move.l  d1,d2           ; Temp store in d2
+000010CC  E49A                     180      ror.l   #2,d2           ; Shift bits 1,0 into 31,30
+000010CE  0282 C0000000            181      andi.l  #$C0000000,d2   ; Zero out every other bit 
+000010D4  E599                     182      rol.l   #2,d1           ; Shift Left by 2 places
+000010D6  0282 000000F0            183      andi.l  #$000000F0,d2   ; Zero out unwanted bits
+000010DC  8282                     184      or.l   d2,d1            ; Combine Command bits
+000010DE  8081                     185      or.l   d1,d0            ; Combine command and address bits
+000010E0  4E75                     186      rts
+000010E0  4E75                     187  -------------------- end include --------------------
+000010E2                           188      
+00C00000                           189      org $00C00000
+00C00000                           190  __FAKE_VDP:
+00C00000                           191      ds.b    1024
+00C00400                           192      
+00C00400  FFFF FFFF                193      SIMHALT
+00C00404                           194      END start
 
 No errors detected
 No warnings generated
@@ -153,10 +206,17 @@ Symbol-name         Value
 -------------------------
 START               1000
 TEST_AI_EXPECTED    8F02
+TEST_CMD_ADDRESS    4236
+TEST_CMD_COMMAND    18
+TEST_CMD_WORD_EXPECTED  2360061
 TEST_DATA           DA
 TEST_REGISTER       11
 TEST_REG_EXPECTED   91DA
 TEST_STATUS_VALUE   B00B
+TEST_VDPCREATECMDWORD  1000
+TEST_VDPREADSTATUSINTOD0  103E
+TEST_VDPSETAUTOINCREMENT  1054
+TEST_VDPWRITEREGISTER  101E
 VDPREG_AUTO_INCREMENT  F
 VDPREG_BG_COLOUR    7
 VDPREG_DMA_LENGTH_1  13
@@ -185,12 +245,13 @@ VDP_CTRL_PORT       C00004
 VDP_DATA_PORT       C00000
 VDP_HV_COUNTER      C00008
 VDP_SN76489_PSG     C00011
-_TESTFAILED         104E
-_TESTINGCOMPLETE    104C
-_VDPDISPLAYDISABLE  1060
-_VDPDISPLAYENABLEPAL  105E
-_VDPREADSTATUSINTOD0  1050
-_VDPSETAUTOINCREMENT  1064
-_VDPSETDISPLAYMODE  1062
-_VDPWRITEREGISTER   1078
+_TESTFAILED         106C
+_TESTINGCOMPLETE    106A
+_VDPCREATECMDWORD   10AE
+_VDPDISPLAYDISABLE  107E
+_VDPDISPLAYENABLEPAL  107C
+_VDPREADSTATUSINTOD0  106E
+_VDPSETAUTOINCREMENT  1082
+_VDPSETDISPLAYMODE  1080
+_VDPWRITEREGISTER   1096
 __FAKE_VDP          C00000

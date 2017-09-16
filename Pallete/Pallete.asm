@@ -9,6 +9,7 @@
 ;      - Fun with the VDP Palette
   
     include "../include/Header.asm"
+    include "../include/VDP.asm"
 
 __GameMain:
 
@@ -16,10 +17,9 @@ _PushPallete:
     ; ???
     move.l  #$40000003,VDP_CTRL_PORT
     ; Set autoincrement to 2 bytes
-    ;move.l  #2,-(sp)
+    move.l  #2,-(sp)
     jsr _VDPSetAutoIncrement
-	;addq.l  #4,sp
-    ;move.w  #$8F02,VDP_CTRL_PORT     
+	addq.l  #4,sp
 
     ; Set up VDP to write to CRAM address $0000
     move.l  #$C0000003,VDP_CTRL_PORT 
@@ -50,6 +50,7 @@ _PushCharsLoop:
     move.l (a0)+,VDP_DATA_PORT     
     dbra d0,_PushCharsLoop
 
+
 _DrawChars:
     ; Set up VDP to write to VRAM address $C000 (Plane A)
     ; Low plane, palette 0, no flipping, plus tile ID...
@@ -69,35 +70,9 @@ _DrawChars:
 _finito:
     jmp     _finito
 
-; VDP Set Auto Increment Value
-;   move.l #AI_VALUE,-(sp) 
-;   jsr _VDPSetAutoIncrement
-_VDPSetAutoIncrement:
-    move.w  #$8F02,VDP_CTRL_PORT     
+_Temp:
+    nop
     rts
-    ;move.l   #VDPREG_AUTO_INCREMENT,-(sp)   ; AI Register
-    ;move.l   8(sp),-(sp) ; AI Value ( 8(sp) as we jump over return address)
-    ;jsr _VDPWriteRegister
-    ;addq.l   #8,sp
-    ;rts
-
-; VDP Write Register
-;
-; Data Format
-;   1, 0, ?, R4,R3,R2,R1,R0
-;   D7,D6,D5,D4,D3,D2,D1,D0
-; Usage
-;    move.l #register,-(sp)
-;    move.l #data,-(sp)
-;
-;_VDPWriteRegister:
-;    move.l  4(sp),d0           ; VDP Data
-;    move.l  8(sp),d1           ; VDP Register
-;    ori.b   #$80,d1            ; Register mask
-;    lsl     #8,d1              ; Shift to byte 2
-;    or.w    d1,d0              ; Or Register with Data
-;    move.w  d0,VDP_CTRL_PORT   ; Write to VDP
-;    rts
 
 Palette:
    dc.w $0000 ; Colour 0 - Transparent
@@ -118,7 +93,8 @@ Palette:
    dc.w $0060 ; Colour F - Dark green
 
 Characters:
-   dc.l $11000110 ; Character 0 - H
+   ; Character 0 - H
+   dc.l $11000110 
    dc.l $11000110
    dc.l $11000110
    dc.l $11111110
@@ -126,7 +102,8 @@ Characters:
    dc.l $11000110
    dc.l $11000110
    dc.l $00000000
-   dc.l $11111110 ; Character 1 - E
+   ; Character 1 - E
+   dc.l $11111110 
    dc.l $11000000
    dc.l $11000000
    dc.l $11111110
@@ -134,7 +111,8 @@ Characters:
    dc.l $11000000
    dc.l $11111110
    dc.l $00000000
-   dc.l $11000000 ; Character 2 - L
+   ; Character 2 - L
+   dc.l $11000000 
    dc.l $11000000
    dc.l $11000000
    dc.l $11000000
@@ -142,7 +120,8 @@ Characters:
    dc.l $11111110
    dc.l $11111110
    dc.l $00000000
-   dc.l $01111100 ; Character 3 - O
+   ; Character 3 - O
+   dc.l $01111100 
    dc.l $11101110
    dc.l $11000110
    dc.l $11000110
@@ -150,7 +129,8 @@ Characters:
    dc.l $11101110
    dc.l $01111100
    dc.l $00000000
-   dc.l $11000110 ; Character 4 - W
+   ; Character 4 - W
+   dc.l $11000110 
    dc.l $11000110
    dc.l $11000110
    dc.l $11000110
@@ -158,7 +138,8 @@ Characters:
    dc.l $11101110
    dc.l $11000110
    dc.l $00000000
-   dc.l $11111100 ; Character 5 - R
+   ; Character 5 - R
+   dc.l $11111100
    dc.l $11000110
    dc.l $11001100
    dc.l $11111100
@@ -166,7 +147,8 @@ Characters:
    dc.l $11000110
    dc.l $11000110
    dc.l $00000000
-   dc.l $11111000 ; Character 6 - D
+    ; Character 6 - D
+   dc.l $11111000 
    dc.l $11001110
    dc.l $11000110
    dc.l $11000110
