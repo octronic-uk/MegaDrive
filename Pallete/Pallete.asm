@@ -9,20 +9,27 @@
 ;      - Fun with the VDP Palette
   
     include "../include/Header.asm"
-    include "../include/VDP.asm"
+    include "../include/VDPLib.asm"
 
 __GameMain:
 
 _PushPallete:
-    ; ???
-    move.l  #$40000003,VDP_CTRL_PORT
+
+    ; Setup VRAM write to $C000
+    move.l  #$C000,-(sp)
+    jsr     _VDPWriteVramMode
+    addq.l  #4,sp
+
     ; Set autoincrement to 2 bytes
     move.l  #2,-(sp)
-    jsr _VDPSetAutoIncrement
+    jsr     _VDPSetAutoIncrement
 	addq.l  #4,sp
 
     ; Set up VDP to write to CRAM address $0000
-    move.l  #$C0000003,VDP_CTRL_PORT 
+    move.l  #$0000,-(sp)
+    jsr     _VDPWriteCramMode
+    addq.l  #4,sp
+
     ; Load address of Palette into a0
     lea     Palette,a0               
     ; 32 bytes of data (8 longwords, minus 1 for counter) in palette
@@ -36,25 +43,29 @@ _PushPaletteLoop:
     move.w  #$8700,VDP_CTRL_PORT  
 
 _PushChars:
-    ; jsr _VDPWriteRegister
-
     ; Set up VDP to write to VRAM address $0020
-    move.l  #$40200000,VDP_CTRL_PORT  
+    ;move.l  #$40200000,VDP_CTRL_PORT  
+    move.l  #$0020,-(sp)
+    jsr     _VDPWriteVramMode
+    addq.l  #4,sp
     ; Load address of Characters into a0
     lea     Characters,a0         
-    ; 32*7 bytes of data (56 longwords, minus 1 for counter) in the font
-    move.l  #$37,d0               
+    ; 32*8 bytes of data (64 longwords, minus 1 for counter) in the font
+    move.l  #$3F,d0               
 
 _PushCharsLoop:
     ; Move data to VDP data port, and increment source address
     move.l (a0)+,VDP_DATA_PORT     
     dbra d0,_PushCharsLoop
 
-
 _DrawChars:
     ; Set up VDP to write to VRAM address $C000 (Plane A)
     ; Low plane, palette 0, no flipping, plus tile ID...
-    move.l  #$40000003,VDP_CTRL_PORT  
+    ;move.l  #$40000003,VDP_CTRL_PORT  
+    move.l  #$C000,-(sp)
+    jsr     _VDPWriteVramMode
+    addq.l  #4,sp
+
     move.w  #$0001,VDP_DATA_PORT      ; Pattern ID 1 - H
     move.w  #$0002,VDP_DATA_PORT      ; Pattern ID 2 - E
     move.w  #$0003,VDP_DATA_PORT      ; Pattern ID 3 - L
@@ -66,13 +77,11 @@ _DrawChars:
     move.w  #$0006,VDP_DATA_PORT      ; Pattern ID 6 - R
     move.w  #$0003,VDP_DATA_PORT      ; Pattern ID 3 - L
     move.w  #$0007,VDP_DATA_PORT      ; Pattern ID 7 - D
+    move.w  #$0000,VDP_DATA_PORT      ; Pattern ID 0 - Blank space
+    move.w  #$0008,VDP_DATA_PORT      ; Pattern ID 7 - Smiley
 
 _finito:
     jmp     _finito
-
-_Temp:
-    nop
-    rts
 
 Palette:
    dc.w $0000 ; Colour 0 - Transparent
@@ -94,67 +103,77 @@ Palette:
 
 Characters:
    ; Character 0 - H
-   dc.l $11000110 
-   dc.l $11000110
-   dc.l $11000110
+   dc.l $10000010 
+   dc.l $10000010 
+   dc.l $10000010 
    dc.l $11111110
-   dc.l $11000110
-   dc.l $11000110
-   dc.l $11000110
+   dc.l $10000010 
+   dc.l $10000010 
+   dc.l $10000010 
    dc.l $00000000
    ; Character 1 - E
    dc.l $11111110 
-   dc.l $11000000
-   dc.l $11000000
-   dc.l $11111110
-   dc.l $11000000
-   dc.l $11000000
+   dc.l $10000000
+   dc.l $10000000
+   dc.l $11111000
+   dc.l $10000000
+   dc.l $10000000
    dc.l $11111110
    dc.l $00000000
    ; Character 2 - L
-   dc.l $11000000 
-   dc.l $11000000
-   dc.l $11000000
-   dc.l $11000000
-   dc.l $11000000
-   dc.l $11111110
+   dc.l $10000000 
+   dc.l $10000000
+   dc.l $10000000
+   dc.l $10000000
+   dc.l $10000000
+   dc.l $10000000
    dc.l $11111110
    dc.l $00000000
    ; Character 3 - O
-   dc.l $01111100 
-   dc.l $11101110
-   dc.l $11000110
-   dc.l $11000110
-   dc.l $11000110
-   dc.l $11101110
-   dc.l $01111100
+   dc.l $11111110 
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $11111110
    dc.l $00000000
    ; Character 4 - W
-   dc.l $11000110 
-   dc.l $11000110
-   dc.l $11000110
-   dc.l $11000110
-   dc.l $11010110
+   dc.l $10000010 
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10010010
+   dc.l $10111010
    dc.l $11101110
    dc.l $11000110
    dc.l $00000000
    ; Character 5 - R
+   dc.l $11111110
+   dc.l $10000010
+   dc.l $10000010
    dc.l $11111100
-   dc.l $11000110
-   dc.l $11001100
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $00000000
+   ; Character 6 - D
+   dc.l $11111100 
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10000010
+   dc.l $10000010
    dc.l $11111100
-   dc.l $11001110
-   dc.l $11000110
-   dc.l $11000110
    dc.l $00000000
-    ; Character 6 - D
-   dc.l $11111000 
-   dc.l $11001110
-   dc.l $11000110
-   dc.l $11000110
-   dc.l $11000110
-   dc.l $11001110
-   dc.l $11111000
+   ; Character 6 - :D
+   dc.l $02000020
+   dc.l $21200212
+   dc.l $02000020
    dc.l $00000000
+   dc.l $10000001
+   dc.l $01000010
+   dc.l $00111100
+   dc.l $00000000
+
 
 __end    ; Very last line, end of ROM address

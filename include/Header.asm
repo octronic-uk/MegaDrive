@@ -7,22 +7,8 @@
 ;
 ; Sega Megadrive ROM header and Initialisation.
 
-; System Constants
-INITIAL_SP      equ $00FFE000
-ROM_START       equ $00000000
-RAM_START       equ $00FF0000
-RAM_END         equ $00FFFFFF
-SRAM_START      equ $00000000
-SRAM_END        equ $00000000
-RESET_BUTTON    equ $00A1000C
-RESET_AUX       equ $00A10008
-HW_VERSION      equ $00A10001
-TMSS_SIG        equ $00A14000
-CTRL_PORT_1     equ $00A10009      
-CTRL_PORT_2     equ $00A1000B      
-CTRL_PORT_EXP   equ $00A1000D    
-SEGA_STR        equ 'SEGA'
-
+; Include Constants ONLY
+    include "../include/constants/ROMConstants.asm"
     include "../include/constants/VDPConstants.asm"
     include "../include/constants/Z80Constants.asm"
     include "../include/constants/PSGConstants.asm"
@@ -181,9 +167,10 @@ _ControllerInit:                ; Set IN I/O direction, interrupts off, on all p
     move.b #$00,CTRL_PORT_EXP   ; EXP port CTRL
 
 _InitCleanup:
-    move.l  #$00000000,a0       ; Move 0x0 to a0
+    move.l  #$0,a0              ; Move 0x0 to a0
     movem.l (a0),d0-d7/a1-a7    ; Multiple move 0 to all registers
-    move    #$1700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits) 
+    ;move  #$2700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
+    move  #$0700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
 
 Main:
     jmp __GameMain
@@ -219,7 +206,7 @@ PSGData:
 
 ; VDP Initial Values -----------------------------------------------------------
 VDPRegisters:
-    dc.b $20 ; $00: Horiz. interrupt on, plus bit 2 (unknown, but docs say it needs to be on)
+    dc.b $00 ; $00: Horiz. interrupt on, plus bit 2 (unknown, but docs say it needs to be on)
     dc.b $74 ; $01: Vert. interrupt on, display on, DMA on, V28 mode (28 cells vertically), + bit 2
     dc.b $30 ; $02: Pattern table for Scroll Plane A at $C000 (bits 3-5)
     dc.b $40 ; $03: Pattern table for Window Plane at $10000 (bits 1-5)
@@ -243,3 +230,4 @@ VDPRegisters:
     dc.b $00 ; $15: DMA source address lo byte
     dc.b $00 ; $16: DMA source address mid byte
     dc.b $00 ; $17: DMA source address hi byte, memory-to-VRAM mode (bits 6-7)
+

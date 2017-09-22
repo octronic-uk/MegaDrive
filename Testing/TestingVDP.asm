@@ -16,13 +16,25 @@ TEST_AI_EXPECTED        equ $8F02
 TEST_CMD_WORD_EXPECTED  equ $02360061
 TEST_CMD_COMMAND        equ $18
 TEST_CMD_ADDRESS        equ $4236
+TEST_RED                equ $3
+TEST_GREEN              equ $5
+TEST_BLUE               equ $7
+TEST_RGB_EXPECTED       equ $0EA6
 
     include "../include/constants/VDPConstants.asm"
 
- 	org $1000   ;Place the origin at $2000
+ 	org $2000   ;Place the origin at $2000
     
 start:
 
+Test_VDPCreateRgbD0:
+    move.w  #TEST_RED,-(sp)
+    move.w  #TEST_GREEN,-(sp)
+    move.w  #TEST_BLUE,-(sp)
+    jsr     _VDPCreateRgbD0
+    addq.l  #6,sp 
+    cmpi.w  #TEST_RGB_EXPECTED,d0
+    bne     _TestFailed
 
 Test_VDPCreateCmdWord:
     move.l  #TEST_CMD_COMMAND,-(sp)
@@ -30,6 +42,14 @@ Test_VDPCreateCmdWord:
     jsr     _VDPCreateCmdWord
     addq.l  #8,sp
     cmpi.l  #TEST_CMD_WORD_EXPECTED,d0
+    bne     _TestFailed
+
+Test_VDPCreateCmdWordCRAM:
+    move.l  #VDP_CRAM_WRITE,-(sp)
+    move.l  #$0000,-(sp)
+    jsr     _VDPCreateCmdWord
+    addq.l  #8,sp
+    cmpi.l  #$C0000000,d0
     bne     _TestFailed
 
 Test_VDPWriteRegister:
@@ -40,9 +60,9 @@ Test_VDPWriteRegister:
 	cmpi.w  #TEST_REG_EXPECTED,VDP_CTRL_PORT
 	bne     _TestFailed
 	
-Test_VDPReadStatusIntoD0:
+Test_VDPReadStatusD0:
 	move.w  #TEST_STATUS_VALUE,VDP_CTRL_PORT
-	jsr     _VDPReadStatusIntoD0
+	jsr     _VDPReadStatusD0
 	cmpi.w  #TEST_STATUS_VALUE,d0
 	bne     _TestFailed
 	
@@ -59,7 +79,7 @@ _TestingComplete:
 _TestFailed:
     bra _TestFailed
     
-	include "../include/VDP.asm"
+	include "../include/VDPLib.asm"
 	
 	org $00C00000
 __FAKE_VDP:

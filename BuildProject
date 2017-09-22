@@ -29,11 +29,12 @@ if [[ $? == 0 ]]; then
 
     file ${PROJECT}.${_MD_ROM_EXT}
 
-    echo "Run (Y/N): "
-    read run_ans
+    #echo "Debug with BlastEm? (Y/N): "
+    #read run_ans="Y"
+    run_ans="Y"
 
     if [[ ${run_ans} == "Y" || ${run_ans} == "y" ]]; then
-        open ${PROJECT}.${_MD_ROM_EXT}
+        /opt/blastem-osx-0.5.1/blastem -d ${PROJECT}.${_MD_ROM_EXT}
     fi
 else
     echo "Build Failed :("
