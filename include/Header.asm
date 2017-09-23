@@ -83,7 +83,7 @@
 	dc.b    '(C)SEGA 1992.SEP'                                 ; Copyrght / Release
 	dc.b    'Ashs Game                                       ' ; Domestic name
 	dc.b    'Ashs Game                                       ' ; International name
-	dc.b    'GM XXXXXXXX-XX'                                   ; Version number
+	dc.b    'GM 12345678-90'                                   ; Version number
 	dc.w    $0000                                              ; Checksum
 	dc.b    'J               '                                 ; I/O support
 	dc.l    ROM_START                                          ; Start address of ROM
@@ -114,9 +114,10 @@ _SystemInitClear:
                                 ; into it
     dbra    d1,_SystemInitClear ; Decrement d0, repeat until depleted
 
+    ; At addr $22C
     move.b  HW_VERSION,d0       ; Move Megadrive hardware version to d0
     andi.b  #$0F,d0             ; The version is stored in last four bits, so mask it with 0F
-    beq     _SkipTMSS           ; If version is equal to 0, skip TMSS signature
+    beq.b   _SkipTMSS           ; If version is equal to 0, skip TMSS signature
     move.l  #SEGA_STR,TMSS_SIG  ; Move the string 'SEGA' to $A14000
 
 _SkipTMSS:
@@ -168,9 +169,9 @@ _ControllerInit:                ; Set IN I/O direction, interrupts off, on all p
 
 _InitCleanup:
     move.l  #$0,a0              ; Move 0x0 to a0
-    movem.l (a0),d0-d7/a1-a7    ; Multiple move 0 to all registers
-    ;move  #$2700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
-    move  #$0700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
+    movem.l (a0),d0-d7/a1-a6    ; Multiple move 0 to all registers
+    ; $2E0
+    move    #$2700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
 
 Main:
     jmp __GameMain

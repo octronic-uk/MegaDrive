@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PROJECT=$1
+DEBUG=$2
 
 # File Extensions
 _ASM_EXT=asm
@@ -34,7 +35,11 @@ if [[ $? == 0 ]]; then
     run_ans="Y"
 
     if [[ ${run_ans} == "Y" || ${run_ans} == "y" ]]; then
-        /opt/blastem-osx-0.5.1/blastem -d ${PROJECT}.${_MD_ROM_EXT}
+        if [[ ${DEBUG} ]]; then
+            /opt/blastem-osx-0.5.1/blastem -d ${PROJECT}.${_MD_ROM_EXT}
+        else
+            /opt/blastem-osx-0.5.1/blastem ${PROJECT}.${_MD_ROM_EXT}
+        fi
     fi
 else
     echo "Build Failed :("

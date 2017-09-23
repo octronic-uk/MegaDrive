@@ -190,3 +190,16 @@ _VDPSetSpriteY:
     move.l  4(sp),d1
     move.w  d1,VDP_DATA_PORT
     rts
+
+_VDPWaitVBlankStart:
+   move.w   VDP_CTRL_PORT,d0    ; Move VDP status word to d0
+   andi.w   #$0008,d0           ; AND with bit 4 (vblank), result in status register
+   bne      _VDPWaitVBlankStart ; Branch if not equal (to zero)
+   rts
+ 
+_VDPWaitVBlankEnd:
+   move.w   VDP_CTRL_PORT,d0     ; Move VDP status word to d0
+   andi.w   #$0008,d0            ; AND with bit 4 (vblank), result in status register
+   beq       _VDPWaitVBlankEnd   ; Branch if equal (to zero)
+   rts
+

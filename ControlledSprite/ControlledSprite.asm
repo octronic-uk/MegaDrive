@@ -11,6 +11,7 @@
 ; Includes
     include "../include/Header.asm"
     include "../include/VDP.asm"
+    include "../include/Controller.asm"
 ; Assets
     include "../Assets/dude.asm"   
 
@@ -19,9 +20,9 @@ __GameMain:
 _PushPallete:
 
     ; Setup VRAM write to $C000
-    ;move.l  #$C000,-(sp)
-    ;jsr     _VDPWriteVramMode
-    ;addq.l  #4,sp
+    move.l  #$C000,-(sp)
+    jsr     _VDPWriteVramMode
+    addq.l  #4,sp
 
     ; Set autoincrement to 2 bytes
     move.l  #2,-(sp)
@@ -64,73 +65,84 @@ _PushTilesLoop:
     dbra d0,_PushTilesLoop
 
 _DrawSprite:
-    jsr     _VDPWaitVBlankBegin
     move.l  #VDP_SPRITE_TABLE,-(sp)
     jsr     _VDPWriteVramMode
     addq.l  #4,sp
     pea     DudeSpriteDescriptor
     jsr     _VDPLoadSpriteTable
     addq.l  #4,sp
-    jmp     _MoveSpriteStart
     
     move.l  #VDP_SPRITE_X_MIN,d6
     move.l  #VDP_SPRITE_Y_MIN,d7
-    move.l  #1,d3 ; X DIR
-    move.l  #1,d4 ; Y DIR
 
-_MoveSpriteStart:
-    move.l  #$FFF,d5
-_MoveSpriteWait:
-    dbra    d5,_MoveSpriteWait
+_SetSpritePos:    
 
-    ; Check X Direction
-    cmpi.l  #1,d3
-    bne     _MoveSpriteLeft
-
-_MoveSpriteRight:
-    addq.l  #1,d6
-    cmpi.l  #VDP_SPRITE_X_MAX_40-24,d6
-    blt     _MoveSpriteXDone
-    move.l  #0,d3 ; Toggle X Direction to Left
-    jmp     _MoveSpriteXDone
-
-_MoveSpriteLeft:
-    subq.l  #1,d6
-    cmpi.l  #VDP_SPRITE_X_MIN,d6
-    bgt     _MoveSpriteXDone
-    move.l  #$1,d3 ; Toggle X Direction to Right
-
-_MoveSpriteXDone:    
-
-    ; Check Y Direction
-    cmpi.l  #1,d4
-    bne     _MoveSpriteUp
-
-_MoveSpriteDown:
-    addq.l  #1,d7
-    cmpi.l  #VDP_SPRITE_Y_MAX_32-24,d7
-    blt     _MoveSpriteYDone
-    move.l  #0,d4 ; Toggle Y Direction to Up
-    jmp     _MoveSpriteYDone
-
-_MoveSpriteUp:
-    subq.l  #1,d7
-    cmpi.l  #VDP_SPRITE_Y_MIN,d7
-    bgt     _MoveSpriteYDone
-    move.l  #1,d4 ; Toggle Y Direction to Down
-
-_MoveSpriteYDone:
-
-_MoveSpriteDoMove:    
     move.l  #VDP_SPRITE_TABLE,-(sp)
     move.l  d6,-(sp)
     move.l  d7,-(sp)
     jsr     _VDPSetSpriteXY
     addq.l  #8,sp   
-    addq.l  #4,sp   
+    addq.l  #4,sp
 
-    jsr     _VDPWaitVBlankEnd
-    jmp     _MoveSpriteStart
+    move.w  #$FFF,d5
+_CheckCtrlDelay:
+    dbra    d5,_CheckCtrlDelay
+    
+_CheckCtrl:
+    jsr     _CtrlReadPad1D0
+
+_CheckCtrlUp:
+    btst    #CTRL_UP,d0
+    bne     _CheckCtrlDown
+    jsr     _MoveSpriteUp
+
+_CheckCtrlDown:
+    btst    #CTRL_DOWN,d0
+    bne     _CheckCtrlLeft
+    jsr     _MoveSpriteDown
+
+_CheckCtrlLeft:
+    btst    #CTRL_LEFT,d0
+    bne     _CheckCtrlRight
+    jsr     _MoveSpriteLeft
+
+_CheckCtrlRight:
+    btst    #CTRL_RIGHT,d0
+    bne     _CheckCtrlDone
+    jsr     _MoveSpriteRight
+
+_CheckCtrlDone:
+    jmp     _SetSpritePos
+
+_MoveSpriteUp:
+    cmpi.l  #VDP_SPRITE_Y_MIN,d7
+    ble     _MoveSpriteUpDone
+    subq.l  #1,d7
+_MoveSpriteUpDone:
+    rts
+
+_MoveSpriteDown:
+    cmpi.l  #VDP_SPRITE_Y_MAX_32-24,d7
+    bge     _MoveSpriteDownDone
+    addq.l  #1,d7
+_MoveSpriteDownDone:
+    rts
+
+_MoveSpriteLeft:
+    cmpi.l  #VDP_SPRITE_X_MIN,d6
+    ble     _MoveSpriteLeftDone
+    subq.l  #1,d6
+_MoveSpriteLeftDone:
+    rts
+
+_MoveSpriteRight:
+    cmpi.l  #VDP_SPRITE_X_MAX_40-24,d6
+    bge    _MoveSpriteRightDone
+    addq.l  #1,d6
+_MoveSpriteRightDone:
+    rts
+
+; End of ROM Loop
 
 _finished:
     jmp     _finished
