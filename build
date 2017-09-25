@@ -1,7 +1,6 @@
 #!/bin/bash
 
 PROJECT=$1
-DEBUG=$2
 
 # File Extensions
 _ASM_EXT=asm
@@ -19,28 +18,38 @@ fi
     
 rm -rfv *.${_MD_ROM_EXT}
 
+echo
 vasmm68k-mot ${_FLAGS} \
     -o ${PROJECT}.${_MD_ROM_EXT} \
     ${PROJECT}.${_ASM_EXT}
+echo
 
 if [[ $? == 0 ]]; then
 
+    echo
     echo "Build Succeeded! :D"
-    echo "Running 'file' on " ${PROJECT}.${_MD_ROM_EXT}
+    echo
 
+    # Padd File
+    echo "Padding rom to 1MB..."
+    echo `pwd`
+    ../tools/PadTo1M  ${PROJECT}.${_MD_ROM_EXT}
+
+    # Fix Checksum
+    echo Fixing Checksum...
+    ../tools/FixChecksum.py  ${PROJECT}.${_MD_ROM_EXT}
+
+    echo
+    echo "Running 'file and ls -la' on " ${PROJECT}.${_MD_ROM_EXT}
+    ls -la ${PROJECT}.${_MD_ROM_EXT}
     file ${PROJECT}.${_MD_ROM_EXT}
+    echo
 
-    #echo "Debug with BlastEm? (Y/N): "
-    #read run_ans="Y"
-    run_ans="Y"
+    echo Running BlastEm
+    ~/software/blastem/blastem ${PROJECT}.${_MD_ROM_EXT}
 
-    if [[ ${run_ans} == "Y" || ${run_ans} == "y" ]]; then
-        if [[ ${DEBUG} ]]; then
-            /opt/blastem-osx-0.5.1/blastem -d ${PROJECT}.${_MD_ROM_EXT}
-        else
-            /opt/blastem-osx-0.5.1/blastem ${PROJECT}.${_MD_ROM_EXT}
-        fi
-    fi
+    exit 0
 else
     echo "Build Failed :("
+    exit 1
 fi

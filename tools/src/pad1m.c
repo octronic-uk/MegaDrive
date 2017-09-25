@@ -22,7 +22,7 @@ main
     }
 
     int inputFileDescriptor = open(args[1], O_WRONLY);
-    int outputFileSize = ONE_MEG; //atoi(args[2])-1;
+    int outputFileSize = ONE_MEG-1; //atoi(args[2])-1;
     int inputFileSize = lseek(inputFileDescriptor, 0, SEEK_END);
     write(inputFileDescriptor, "\0", 1);
 

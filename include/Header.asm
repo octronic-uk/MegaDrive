@@ -79,7 +79,7 @@
 	dc.l   Exception       ; Unused (reserved)
 	dc.l   Exception       ; Unused (reserved)
 ; Header Section ---------------------------------------------------------------
-	dc.b    'SEGA GENESIS    '                                 ; Console name
+	dc.b    'SEGA MEGA DRIVE '                                 ; Console name
 	dc.b    '(C)SEGA 1992.SEP'                                 ; Copyrght / Release
 	dc.b    'Ashs Game                                       ' ; Domestic name
 	dc.b    'Ashs Game                                       ' ; International name
@@ -98,11 +98,25 @@
 	dc.l    $00000000                                          ; Unused
 	dc.b    '                                        '         ; Notes (unused)
 	dc.b    'JUE             '                                 ; Country codes
+; All this crap Should be $200 long
+
 _EntryPoint: ; -----------------------------------------------------------------
-    tst.w    RESET_AUX          ; Test mystery reset (expansion port reset?)
-    bne      Main               ; Branch if Not Equal (to zero) - to Main
-    tst.w    RESET_BUTTON       ; Test reset button
-    bne      Main               ; Branch if Not Equal (to zero) - to Main
+
+_SetStatusReg:
+    move    #$2700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
+
+_CheckTMSS:
+    move.b  HW_VERSION,d0       ; Move Megadrive hardware version to d0
+    andi.b  #$0F,d0             ; The version is stored in last four bits, so mask it with 0F
+    beq.b   _SkipTMSS           ; If version is equal to 0, skip TMSS signature
+    move.l  #SEGA_STR,TMSS_SIG  ; Move the string 'SEGA' to $A14000
+_SkipTMSS:
+
+_CheckReset:
+    tst.l    RESET_AUX          ; Test mystery reset (expansion port reset?)
+    bne      _SystemInit        ; Branch if Not Equal (to zero) - to Main
+    tst.l    RESET_BUTTON       ; Test reset button
+    bne      _SystemInit        ; Branch if Not Equal (to zero) - to Main
 
 _SystemInit:
     move.l  #$00000000,d0       ; Place a 0 into d0, ready to copy to each longword of RAM
@@ -114,13 +128,7 @@ _SystemInitClear:
                                 ; into it
     dbra    d1,_SystemInitClear ; Decrement d0, repeat until depleted
 
-    ; At addr $22C
-    move.b  HW_VERSION,d0       ; Move Megadrive hardware version to d0
-    andi.b  #$0F,d0             ; The version is stored in last four bits, so mask it with 0F
-    beq.b   _SkipTMSS           ; If version is equal to 0, skip TMSS signature
-    move.l  #SEGA_STR,TMSS_SIG  ; Move the string 'SEGA' to $A14000
 
-_SkipTMSS:
 _Z80Init:
     move.w  #$0100,Z80_BUSREQ   ; Request access to the Z80 bus, by writing $0100 into the 
                                 ; BUSREQ port
@@ -170,8 +178,6 @@ _ControllerInit:                ; Set IN I/O direction, interrupts off, on all p
 _InitCleanup:
     move.l  #$0,a0              ; Move 0x0 to a0
     movem.l (a0),d0-d7/a1-a6    ; Multiple move 0 to all registers
-    ; $2E0
-    move    #$2700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
 
 Main:
     jmp __GameMain
