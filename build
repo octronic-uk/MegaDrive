@@ -22,18 +22,21 @@ echo
 vasmm68k-mot ${_FLAGS} \
     -o ${PROJECT}.${_MD_ROM_EXT} \
     ${PROJECT}.${_ASM_EXT}
+
+BUILD_RESULT=$?
+
 echo
 
-if [[ $? == 0 ]]; then
+if [[ ${BUILD_RESULT} == 0 ]]; then
 
     echo
     echo "Build Succeeded! :D"
     echo
 
     # Padd File
-    echo "Padding rom to 1MB..."
-    echo `pwd`
-    ../tools/PadTo1M  ${PROJECT}.${_MD_ROM_EXT}
+    #echo "Padding rom to 1MB..."
+    #echo `pwd`
+    #../tools/PadTo1M  ${PROJECT}.${_MD_ROM_EXT}
 
     # Fix Checksum
     echo Fixing Checksum...
@@ -45,8 +48,8 @@ if [[ $? == 0 ]]; then
     file ${PROJECT}.${_MD_ROM_EXT}
     echo
 
-    echo Running BlastEm
-    ~/software/blastem/blastem ${PROJECT}.${_MD_ROM_EXT}
+    #echo Running BlastEm
+    ~/software/blastem/blastem -d ${PROJECT}.${_MD_ROM_EXT}
 
     exit 0
 else
