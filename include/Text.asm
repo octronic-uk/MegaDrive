@@ -140,42 +140,42 @@ CharOffsetStart     equ $20 ; First ASCII code in table
 
 CharOffsetMap:
 	dc.b $00	; SPACE (ASCII code $20)
-	dc.b $28   ; ! Exclamation mark
-	dc.b $2B   ; " Double quotes
-	dc.b $2E   ; # Hash
+	dc.b $28    ; ! Exclamation mark
+	dc.b $2B    ; " Double quotes
+	dc.b $2E    ; # Hash
 	dc.b $00	; UNUSED
 	dc.b $00	; UNUSED
 	dc.b $00	; UNUSED
-	dc.b $2C   ; ' Single quote
-	dc.b $29   ; ( Open parenthesis
-	dc.b $2A   ; ) Close parenthesis
+	dc.b $2C    ; ' Single quote
+	dc.b $29    ; ( Open parenthesis
+	dc.b $2A    ; ) Close parenthesis
 	dc.b $00	; UNUSED
-	dc.b $2F   ; + Plus
-	dc.b $26   ; , Comma
-	dc.b $30   ; - Minus
-	dc.b $25   ; . Full stop
-	dc.b $31   ; / Slash or divide
-	dc.b $1B   ; 0 Zero
-	dc.b $1C   ; 1 One
-	dc.b $1D   ; 2 Two
-	dc.b $1E   ; 3 Three
-	dc.b $1F   ; 4 Four
-	dc.b $20   ; 5 Five
-	dc.b $21   ; 6 Six
-	dc.b $22   ; 7 Seven
-	dc.b $23   ; 8 Eight
-	dc.b $24   ; 9 Nine
-	dc.b $2D   ; : Colon
-	dc.b $00	; UNUSED
-	dc.b $00	; UNUSED
+	dc.b $2F    ; + Plus
+	dc.b $26    ; , Comma
+	dc.b $30    ; - Minus
+	dc.b $25    ; . Full stop
+	dc.b $31    ; / Slash or divide
+	dc.b $1B    ; 0 Zero
+	dc.b $1C    ; 1 One
+	dc.b $1D    ; 2 Two
+	dc.b $1E    ; 3 Three
+	dc.b $1F    ; 4 Four
+	dc.b $20    ; 5 Five
+	dc.b $21    ; 6 Six
+	dc.b $22    ; 7 Seven
+	dc.b $23    ; 8 Eight
+	dc.b $24    ; 9 Nine
+	dc.b $2D    ; : Colon
 	dc.b $00	; UNUSED
 	dc.b $00	; UNUSED
-	dc.b $27   ; ? Question mark
+	dc.b $00	; UNUSED
+	dc.b $00	; UNUSED
+	dc.b $27    ; ? Question mark
 	dc.b $00	; UNUSED
 	dc.b $01	; A
-	dc.b $02   ; B
+	dc.b $02    ; B
 	dc.b $03	; C
-	dc.b $04   ; D
+	dc.b $04    ; D
 	dc.b $05	; E
 	dc.b $06	; F
 	dc.b $07	; G
@@ -694,15 +694,25 @@ _TextOnPlaneA:
     move.l  12(sp),d0          ; d0 (w) - First tile ID of font
     move.l  8(sp),d1           ; d1 (bb)- XY coord (in tiles)
     move.l  4(sp),d2           ; d2 (b) - Palette
+
     clr.l    d3                ; Clear d3 ready to work with
 	move.b   d1,d3             ; Move Y coord (lower byte of d1) to d3
 	mulu.w   #$0040,d3         ; Multiply Y by line width (H40 mode - 64 lines horizontally) to get Y offset
 	ror.l    #$8,d1            ; Shift X coord from upper to lower byte of d1
 	add.b    d1,d3             ; Add X coord to offset
 	mulu.w   #$2,d3            ; Convert to words
-	swap     d3                ; Shift address offset to upper word
-	add.l    #$40000003,d3     ; Add PlaneA write cmd + address
-	move.l   d3,VDP_CTRL_PORT  ; Send to VDP control port
+
+	;swap     d3                ; Shift address offset to upper word
+	;add.l    #$40000003,d3     ; Add PlaneA write cmd + address
+	;move.l   d3,VDP_CTRL_PORT  ; Send to VDP control port
+
+    add.l   #$C000,d3 
+    movem.l d0-d3/a0,-(sp)
+    move.l  d3,-(sp)
+    jsr     _VDPWriteVramMode
+    addq.l  #4,sp
+    movem.l (sp)+,d0-d3/a0
+
 	clr.l    d3                ; Clear d3 ready to work with again
 	move.b   d2,d3             ; Move palette ID (lower byte of d2) to d3
 	rol.l    #$8,d3            ; Shift palette ID to bits 14 and 15 of d3
