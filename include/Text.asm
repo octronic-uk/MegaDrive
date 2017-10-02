@@ -664,6 +664,29 @@ _PixelFontTileID	equ (_PixelFontVRAM/32)             ; ID of first tile
     nop     0,8
 
 _TextLoadFont:
+
+    ; Set autoincrement to 2 bytes
+    move.l  #2,-(sp)
+    jsr     _VDPSetAutoIncrement
+	addq.l  #4,sp
+
+    ; Set up VDP to write to CRAM address $0000
+    move.l  #$0000,-(sp)
+    jsr     _VDPWriteCramMode
+    addq.l  #4,sp
+
+    ; Load address of Palette into a0
+    lea     _TextPalette,a0               
+    ; 32 bytes of data (8 longwords, minus 1 for counter) in palette
+    move.l  #8,d0                  
+    subq.l  #1,d0                  
+
+_PushPaletteLoop:
+    ; Move data to VDP data port, and increment source address
+    move.l  (a0)+,VDP_DATA_PORT        
+    dbra    d0,_PushPaletteLoop
+
+
     move.l  #_PixelFontVRAM,-(sp) ; d0 - VRAM address
     jsr     _VDPWriteVramMode
     addq.l  #4,sp
@@ -671,6 +694,7 @@ _TextLoadFont:
     move.l  #_PixelFontSizeT,d1   ; d1 - Num chars in tiles
     subq.b  #1,d1                 ; Num chars - 1
     lea     _PixelFontStart,a0    ; a0 - Font address
+
 _TextLoadFontCharCopy:
     move.w  #8,d2                 ; 8 longwords in tile
     subq.b  #1,d2                 ; - 1 for loop
@@ -729,3 +753,37 @@ _TextOnPlaneA_CharCopy:
 	jmp      _TextOnPlaneA_CharCopy ; Next character
 _TextOnPlaneA_End:
 	rts
+
+_TextPalette:
+   dc.w $0000 ; Colour 0 - Transparent
+   dc.w $0EEE ; Colour 1 - White
+   dc.w $0EEE ; Colour 2 - White
+   dc.w $0EEE ; Colour 3 - White
+   dc.w $0EEE ; Colour 4 - White
+   dc.w $0EEE ; Colour 5 - White
+   dc.w $0EEE ; Colour 6 - White
+   dc.w $0EEE ; Colour 7 - White
+   dc.w $0EEE ; Colour 8 - White
+   dc.w $0EEE ; Colour 9 - White
+   dc.w $0EEE ; Colour A - White
+   dc.w $0EEE ; Colour B - White
+   dc.w $0EEE ; Colour C - White
+   dc.w $0EEE ; Colour D - White
+   dc.w $0EEE ; Colour E - White
+   dc.w $0EEE ; Colour F - White
+
+   ;dc.w $008E ; Colour 7 - Orange
+   ;dc.w $000E ; Colour 1 - Red
+   ;dc.w $00E0 ; Colour 2 - Green
+   ;dc.w $0E00 ; Colour 3 - Blue
+   ;dc.w $0000 ; Colour 4 - Black
+   ;dc.w $00EE ; Colour 6 - Yellow
+   ;dc.w $0E0E ; Colour 8 - Pink
+   ;dc.w $0808 ; Colour 9 - Purple
+   ;dc.w $0444 ; Colour A - Dark grey
+   ;dc.w $0888 ; Colour B - Light grey
+   ;dc.w $0EE0 ; Colour C - Turquoise
+   ;dc.w $000A ; Colour D - Maroon
+   ;dc.w $0600 ; Colour E - Navy blue
+   ;dc.w $0060 ; Colour F - Dark green
+

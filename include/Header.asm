@@ -14,73 +14,73 @@
     include "../include/constants/PSGConstants.asm"
 
 ; Exception Table --------------------------------------------------------------
-	dc.l   INITIAL_SP      ; Initial stack pointer value
-	dc.l   _EntryPoint     ; Start of program
-	dc.l   Exception       ; Bus error
-	dc.l   Exception       ; Address error
-	dc.l   Exception       ; Illegal instruction
-	dc.l   Exception       ; Division by zero
-	dc.l   Exception       ; CHK exception
-	dc.l   Exception       ; TRAPV exception
-	dc.l   Exception       ; Privilege violation
-	dc.l   Exception       ; TRACE exception
-	dc.l   Exception       ; Line-A emulator
-	dc.l   Exception       ; Line-F emulator
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Spurious exception
-	dc.l   Exception       ; IRQ level 1
-	dc.l   Exception       ; IRQ level 2
-	dc.l   Exception       ; IRQ level 3
-	dc.l   HBlankInterrupt ; IRQ level 4 (horizontal retrace interrupt)
-	dc.l   Exception       ; IRQ level 5
-	dc.l   VBlankInterrupt ; IRQ level 6 (vertical retrace interrupt)
-	dc.l   Exception       ; IRQ level 7
-	dc.l   Exception       ; TRAP #00 exception
-	dc.l   Exception       ; TRAP #01 exception
-	dc.l   Exception       ; TRAP #02 exception
-	dc.l   Exception       ; TRAP #03 exception
-	dc.l   Exception       ; TRAP #04 exception
-	dc.l   Exception       ; TRAP #05 exception
-	dc.l   Exception       ; TRAP #06 exception
-	dc.l   Exception       ; TRAP #07 exception
-	dc.l   Exception       ; TRAP #08 exception
-	dc.l   Exception       ; TRAP #09 exception
-	dc.l   Exception       ; TRAP #10 exception
-	dc.l   Exception       ; TRAP #11 exception
-	dc.l   Exception       ; TRAP #12 exception
-	dc.l   Exception       ; TRAP #13 exception
-	dc.l   Exception       ; TRAP #14 exception
-	dc.l   Exception       ; TRAP #15 exception
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
-	dc.l   Exception       ; Unused (reserved)
+	dc.l   INITIAL_SP               ; Initial stack pointer value
+	dc.l   _EntryPoint              ; Start of program
+	dc.l   E_Bus                    ; Bus error
+	dc.l   E_Address                ; Address error
+	dc.l   E_IllegalInstruction     ; Illegal instruction
+	dc.l   E_DivisionByZero         ; Division by zero
+	dc.l   E_Chk                    ; CHK exception
+	dc.l   E_TrapV                  ; TRAPV exception
+	dc.l   E_PrivilegeViolation     ; Privilege violation
+	dc.l   E_Trace                  ; TRACE exception
+	dc.l   E_Line_A_Emulator        ; Line-A emulator
+	dc.l   E_Line_F_Emulator        ; Line-F emulator
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   E_Spurious               ; Spurious exception
+	dc.l   E_IRQ                    ; IRQ level 1
+	dc.l   E_IRQ                    ; IRQ level 2
+	dc.l   E_IRQ                    ; IRQ level 3
+	dc.l   HBlankInterrupt          ; IRQ level 4 (horizontal retrace interrupt)
+	dc.l   E_IRQ                    ; IRQ level 5
+	dc.l   VBlankInterrupt          ; IRQ level 6 (vertical retrace interrupt)
+	dc.l   E_IRQ                    ; IRQ level 7
+	dc.l   E_Trap                   ; TRAP #00 exception
+	dc.l   E_Trap                   ; TRAP #01 exception
+	dc.l   E_Trap                   ; TRAP #02 exception
+	dc.l   E_Trap                   ; TRAP #03 exception
+	dc.l   E_Trap                   ; TRAP #04 exception
+	dc.l   E_Trap                   ; TRAP #05 exception
+	dc.l   E_Trap                   ; TRAP #06 exception
+	dc.l   E_Trap                   ; TRAP #07 exception
+	dc.l   E_Trap                   ; TRAP #08 exception
+	dc.l   E_Trap                   ; TRAP #09 exception
+	dc.l   E_Trap                   ; TRAP #10 exception
+	dc.l   E_Trap                   ; TRAP #11 exception
+	dc.l   E_Trap                   ; TRAP #12 exception
+	dc.l   E_Trap                   ; TRAP #13 exception
+	dc.l   E_Trap                   ; TRAP #14 exception
+	dc.l   E_Trap                   ; TRAP #15 exception
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
+	dc.l   Exception                ; Unused (reserved)
 ; Header Section ---------------------------------------------------------------
 	dc.b    'SEGA MEGA DRIVE '                                 ; Console name
-	dc.b    '(C)SEGA 1992.SEP'                                 ; Copyrght / Release
+	dc.b    '(C)OCTRONIC 2017'                                 ; Copyrght / Release
 	dc.b    'Ashs Game                                       ' ; Domestic name
 	dc.b    'Ashs Game                                       ' ; International name
 	dc.b    'GM 12345678-90'                                   ; Version number
@@ -97,87 +97,128 @@
 	dc.l    $00000000                                          ; Unused
 	dc.l    $00000000                                          ; Unused
 	dc.b    '                                        '         ; Notes (unused)
-	dc.b    'JUE             '                                 ; Country codes
+	dc.b    'E               '                                 ; Country codes
 ; All this crap Should be $200 long
 
 _EntryPoint: ; -----------------------------------------------------------------
+	move    #$2700,sr	                ; Disable interrupts.
+	tst.l   $A10008		                ; Test port A control.
+	bne.s   _Header_PortA_Ok	        ; If so, magically branch.
+	tst.w   $A1000C		                ; Test port C control.
+_Header_PortA_Ok:
+	bne.w   _Header_PortC_Ok
+	move.b  $A10001,d0		            ; Get hardware version.
+	andi.b  #$F,d0			            ; Compare.
+	beq.s   _Header_SkipSecurity		; If the console has no TMSS, skip the security stuff.
+	move.l  #'SEGA',$A14000	            ; Make the TMSS happy.
+_Header_SkipSecurity:
 
-_SetStatusReg:
-    move    #$2700,sr           ; Init status register (no trace, A7 is Interrupt Stack Pointer, no interrupts, clear condition code bits)
+_Header_Clear_RAM:
+	lea     $FFFF0000,a0	            ; Load start of RAM into a0.
+	move.w  #$3FFF,d0		            ; Clear $3FFF longwords.
+	moveq.l #0,d1			            ; Clear d1.
+_Header_Clear_RAM_Loop:
+	move.l  d1,(a0)+		            ; Clear a long of RAM.
+	dbra    d0,_Header_Clear_RAM_Loop	; Continue clearing RAM if there's anything left.
 
-_CheckTMSS:
-    move.b  HW_VERSION,d0       ; Move Megadrive hardware version to d0
-    andi.b  #$0F,d0             ; The version is stored in last four bits, so mask it with 0F
-    beq.b   _SkipTMSS           ; If version is equal to 0, skip TMSS signature
-    move.l  #SEGA_STR,TMSS_SIG  ; Move the string 'SEGA' to $A14000
-_SkipTMSS:
+    move.l  #2,-(sp) 
+    jsr     _VDPSetAutoIncrement
+    addq.l  #4,sp
 
-_CheckReset:
-    tst.l    RESET_AUX          ; Test mystery reset (expansion port reset?)
-    bne      _SystemInit        ; Branch if Not Equal (to zero) - to Main
-    tst.l    RESET_BUTTON       ; Test reset button
-    bne      _SystemInit        ; Branch if Not Equal (to zero) - to Main
+    jsr     _Header_Clear_VRAM       
+    jsr     _Header_Clear_CRAM
+    jsr     _Header_Clear_VSRAM
+    jmp     _Header_PortC_Ok
+    
 
-_SystemInit:
-    move.l  #$00000000,d0       ; Place a 0 into d0, ready to copy to each longword of RAM
-    move.l  #$00000000,a0       ; Starting from address $0, clearing backwards
-    move.l  #$00003FFF,d1       ; Clearing 64k's worth of longwords (minus 1, for the loop 
-                                ; to be correct)
-_SystemInitClear:
-    move.l  d0,-(a0)            ; Decrement the address by 1 longword, before moving the zero 
-                                ; into it
-    dbra    d1,_SystemInitClear ; Decrement d0, repeat until depleted
+_Header_Clear_CRAM:
+	moveq   #0,d0			            ; Clear d0.
+	move.l  #$C0000000,$C00004	        ; Set VDP to CRAM write.
+	move.w  #$3F,d7			            ; Clear the entire CRAM.
+_Header_Clear_CRAM_Loop:
+	move.w  d0,$C00000	                ; Write 0 to the data port.
+	dbra    d7,_Header_Clear_CRAM_Loop	; Clear the CRAM.
+    rts
+
+_Header_Clear_VSRAM:
+	moveq   #0,d0			            ; Clear d0.
+	move.l  #$40000010,$C00004	        ; Set VDP to VSRAM write.
+	move.w  #$4F,d7			            ; Clear the entire VSRAM.
+_Header_Clear_VSRAM_Loop:
+	move.w  d0,$C00000	                ; Write 0 to the data port.
+	dbra    d7,_Header_Clear_VSRAM_Loop	; Clear the VSRAM.
+    rts
+
+_Header_Clear_VRAM:
+	moveq   #0,d0			            ; Clear d0.
+	move.l  #$40000000,$C00004	        ; Set VDP to VRAM write.
+	move.w  #$7FFF,d7			        ; Clear the entire VRAM.
+_Header_Clear_VRAM_Loop:
+	move.w  d0,$C00000	                ; Write 0 to the data port.
+	dbra    d7,_Header_Clear_VRAM_Loop	; Clear the VRAM.
+    rts
 
 
-_Z80Init:
-    move.w  #$0100,Z80_BUSREQ   ; Request access to the Z80 bus, by writing $0100 into the 
-                                ; BUSREQ port
-    move.w  #$0100,Z80_RESET    ; Hold the Z80 in a reset state, by writing $0100 into the 
-                                ; RESET port
+
+
+_Header_PortC_Ok:
+	bsr.w   _Header_Z80Init		; Initialize the Z80.
+	move    #$2300,sr		; Enable interrupts.
+	jmp     Main    		; Branch to main program.
+	nop
+
+_Header_Z80Init:
+    move.w  #$0100,Z80_BUSREQ   ; Request access to the Z80 bus, by writing $0100 into the BUSREQ port
+    move.w  #$0100,Z80_RESET    ; Hold the Z80 in a reset state, by writing $0100 into the RESET port
      
-_Z80InitWait:
-    btst    #$00,Z80_BUSREQ     ; Test bit 0 of A11100 to see if the 68k has access to the 
-                                ; Z80 bus yet
-    bne     _Z80InitWait        ; If we don't yet have control, branch back up to Wait
+_Header_Z80InitWait:
+    btst    #$00,Z80_BUSREQ     ; Test bit 0 of A11100 to see if the 68k has access to the  Z80 bus yet
+    bne     _Header_Z80InitWait        ; If we don't yet have control, branch back up to Wait
 
-_Z80InitWrite:
+_Header_Z80InitWrite:
     move.l #Z80Data,a0          ; Load address of data into a0
     move.l #Z80_RAM_BASE,a1     ; Copy Z80 RAM address to a1
     move.l #$29,d0              ; 42 bytes of init data (minus 1 for counter)
 
-_Z80InitCopy:
+_Header_Z80InitCopy:
     move.b  (a0)+,(a1)+         ; Copy data, and increment the source/dest addresses
-    dbra    d0,_Z80InitCopy
+    dbra    d0,_Header_Z80InitCopy
     move.w  #Z80_BUS_DISABLE,Z80_RESET    ; Release reset state
     move.w  #Z80_BUS_DISABLE,Z80_BUSREQ   ; Release control of bus
 
-_PSGInit:
+_Header_PSGInit:
     move.l  #PSGData,a0         ; Load address of PSG data into a0
     move.l  #$03,d0             ; 4 bytes of data
 
-_PSGInitCopy:
+_Header_PSGInitCopy:
     move.b (a0)+,PSG_RAM_BASE   ; Copy data to PSG RAM
-    dbra d0,_PSGInitCopy
+    dbra d0,_Header_PSGInitCopy
 
-_VDPInit:
+_Header_VDPInit:
     move.l #VDPRegisters,a0     ; Load address of register table into a0
     move.l #$18,d0              ; 24 registers to write
     move.l #$00008000,d1        ; 'Set register 0' command (and clear the rest of d1 ready)
      
-_VDPInitCopy:
+_Header_VDPInitCopy:
     move.b (a0)+,d1             ; Move register value to lower byte of d1
     move.w  d1,VDP_CTRL_PORT    ; Write command and value to VDP control port
     add.w   #$0100,d1           ; Increment register #
-    dbra    d0,_VDPInitCopy
+    dbra    d0,_Header_VDPInitCopy
 
-_ControllerInit:                ; Set IN I/O direction, interrupts off, on all ports
+_Header_ControllerInit:                ; Set IN I/O direction, interrupts off, on all ports
     move.b #$00,CTRL_PORT_1     ; Controller port 1 CTRL
     move.b #$00,CTRL_PORT_2     ; Controller port 2 CTRL
     move.b #$00,CTRL_PORT_EXP   ; EXP port CTRL
 
-_InitCleanup:
-    move.l  #$0,a0              ; Move 0x0 to a0
+_Header_InitCleanup:
+    move.l  #$0,a0              ; Move $0 to a0
     movem.l (a0),d0-d7/a1-a6    ; Multiple move 0 to all registers
+
+_Header_LoadFont:
+    jsr     _TextLoadFont
+
+_Header_EnableInterrupts:
+	move    #$2300,sr		; Enable interrupts.
 
 Main:
     jmp __GameMain
@@ -190,51 +231,159 @@ VBlankInterrupt:
  
 ; Exception Handlers -----------------------------------------------------------
 
+
+E_Bus:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_BUS_ERROR_STR
+    jmp     ExceptionMsg
+
+E_Address:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_ADDRESS_ERROR_STR
+    jmp     ExceptionMsg
+
+E_IllegalInstruction:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_ILLEGAL_INSTRUCTION_STR
+    jmp     ExceptionMsg
+
+E_DivisionByZero:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_DIVISION_BY_ZERO_STR
+    jmp     ExceptionMsg
+
+E_Chk:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_CHK_EXCEPTION_STR
+    jmp     ExceptionMsg
+
+E_TrapV:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_TRAPV_EXCEPTION_STR
+    jmp     ExceptionMsg
+
+E_PrivilegeViolation:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_PRIVILEGE_VIOLATION_STR
+    jmp     ExceptionMsg
+
+E_Trace:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_TRACE_EXCEPTION_STR
+    jmp     ExceptionMsg
+
+E_Line_A_Emulator:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_LINE_A_EMULATOR_STR
+    jmp     ExceptionMsg
+
+E_Line_F_Emulator:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_LINE_F_EMULATOR_STR
+    jmp     ExceptionMsg
+
+E_Spurious:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_SPURIOUS_EXCEPTION_STR
+    jmp     ExceptionMsg
+
+E_IRQ:
+    movem.l d0-d7/a0-a6,-(sp)
+    pea     E_IRQ_STR
+    jmp     ExceptionMsg
+
+E_Trap:
+    movem.l d0-d7/a0-a7,-(sp)
+    pea     E_TRAP_EXCEPTION_STR
+    jmp     ExceptionMsg
+
+ExceptionMsg:
+    move.l  #_PixelFontTileID,-(sp) ; First font tile
+    move.l  #$0001,-(sp)            ; X,Y
+    move.l  #$0,-(sp)               ; Palette Index
+    jsr     _TextOnPlaneA
+    add.l   #16,sp
+
 Exception:
-   rte   ; Return from Exception
+    pea     EXCEPTION_STRING        ; String
+    move.l  #_PixelFontTileID,-(sp) ; First font tile
+    move.l  #$0000,-(sp)            ; X,Y
+    move.l  #$0,-(sp)               ; Palette Index
+    jsr     _TextOnPlaneA
+    add.l   #16,sp
+    movem.l (sp)+,d0-d7/a0-a6
+    rte                             ; Return from Exception
 
-; Z80 Sample Program -----------------------------------------------------------
-Z80Data:
-    dc.w $af01, $d91f
-    dc.w $1127, $0021
-    dc.w $2600, $f977
-    dc.w $edb0, $dde1
-    dc.w $fde1, $ed47
-    dc.w $ed4f, $d1e1
-    dc.w $f108, $d9c1
-    dc.w $d1e1, $f1f9
-    dc.w $f3ed, $5636
-    dc.w $e9e9, $8104
-    dc.w $8f01
+; Z80 Sample Program ----------------------------------------------------------- 
+Z80Data: 
+    dc.w $af01, $d91f 
+    dc.w $1127, $0021 
+    dc.w $2600, $f977 
+    dc.w $edb0, $dde1  
+    dc.w $fde1, $ed47 
+    dc.w $ed4f, $d1e1 
+    dc.w $f108, $d9c1 
+    dc.w $d1e1, $f1f9 
+    dc.w $f3ed, $5636 
+    dc.w $e9e9, $8104 
+    dc.w $8f01 
 
-; PSG Sample Program -----------------------------------------------------------
-PSGData:
-   dc.w $9fbf, $dfff
+; PSG Sample Program ----------------------------------------------------------- 
+PSGData: 
+    dc.w $9fbf, $dfff 
 
-; VDP Initial Values -----------------------------------------------------------
-VDPRegisters:
-    dc.b $00 ; $00: Horiz. interrupt on, plus bit 2 (unknown, but docs say it needs to be on)
-    dc.b $74 ; $01: Vert. interrupt on, display on, DMA on, V28 mode (28 cells vertically), + bit 2
-    dc.b $30 ; $02: Pattern table for Scroll Plane A at $C000 (bits 3-5)
-    dc.b $40 ; $03: Pattern table for Window Plane at $10000 (bits 1-5)
-    dc.b $05 ; $04: Pattern table for Scroll Plane B at $A000 (bits 0-2)
-    dc.b $70 ; $05: Sprite table at $E000 (bits 0-6)
-    dc.b $00 ; $06: Unused
+; VDP Initial Values ----------------------------------------------------------- 
+VDPRegisters: 
+    dc.b $04 ; $00: Horiz. interrupt on, plus bit 2 (unknown, but docs say it needs to be on) 
+    dc.b $6C ; $01: Vert. interrupt on, display on, DMA on, V28 mode (28 cells vertically), + bit 2 
+    dc.b $30 ; $02: Pattern table for Scroll Plane A at $C000 (bits 3-5) 
+    dc.b $40 ; $03: Pattern table for Window Plane at $10000 (bits 1-5) 
+    dc.b $05 ; $04: Pattern table for Scroll Plane B at $A000 (bits 0-2) 
+    dc.b $70 ; $05: Sprite table at $E000 (bits 0-6) 
+    dc.b $00 ; $06: Unused 
     dc.b $00 ; $07: Background colour - bits 0-3 = colour, bits 4-5 = palette
     dc.b $00 ; $08: Unused
     dc.b $00 ; $09: Unused
-    dc.b $00 ; $0A: Frequency of Horiz. interrupt in Rasters (number of lines travelled by the beam)
-    dc.b $08 ; $0B: External interrupts on, V/H scrolling on
-    dc.b $81 ; $0C: Shadows and highlights off, interlace off, H40 mode (40 cells horizontally)
-    dc.b $34 ; $0D: Horiz. scroll table at $D000 (bits 0-5)
-    dc.b $00 ; $0E: Unused
-    dc.b $00 ; $0F: Autoincrement off
-    dc.b $01 ; $10: Vert. scroll 32, Horiz. scroll 64
-    dc.b $00 ; $11: Window Plane X pos 0 left (pos in bits 0-4, left/right in bit 7)
-    dc.b $00 ; $12: Window Plane Y pos 0 up (pos in bits 0-4, up/down in bit 7)
-    dc.b $00 ; $13: DMA length lo byte
-    dc.b $00 ; $14: DMA length hi byte
-    dc.b $00 ; $15: DMA source address lo byte
-    dc.b $00 ; $16: DMA source address mid byte
-    dc.b $00 ; $17: DMA source address hi byte, memory-to-VRAM mode (bits 6-7)
+    dc.b $00 ; $0A/10: Frequency of Horiz. interrupt in Rasters (number of lines travelled by the beam)
+    dc.b $00 ; $0B/11: External interrupts on, V/H scrolling on
+    dc.b $81 ; $0C/12: Shadows and highlights off, interlace off, H40 mode (40 cells horizontally)
+    dc.b $34 ; $0D/13: Horiz. scroll table at $D000 (bits 0-5)
+    dc.b $00 ; $0E/14: Unused
+    dc.b $00 ; $0F/15: Autoincrement off
+    dc.b $01 ; $10/16: Vert. scroll 32, Horiz. scroll 64
+    dc.b $00 ; $11/17: Window Plane X pos 0 left (pos in bits 0-4, left/right in bit 7)
+    dc.b $00 ; $12/18: Window Plane Y pos 0 up (pos in bits 0-4, up/down in bit 7)
+    dc.b $00 ; $13/19: DMA length lo byte
+    dc.b $00 ; $14/20: DMA length hi byte
+    dc.b $00 ; $15/21: DMA source address lo byte
+    dc.b $00 ; $16/22: DMA source address mid byte
+    dc.b $00 ; $17/23: DMA source address hi byte, memory-to-VRAM mode (bits 6-7)
 
+EXCEPTION_STRING:
+    dc.b    "WHAT KIND OF FUCKERY IS THIS???",0,0
+E_BUS_ERROR_STR:
+    dc.b    "BUS ERROR              ",0,0
+E_ADDRESS_ERROR_STR:
+    dc.b    "ADDRESS ERROR          ",0,0
+E_ILLEGAL_INSTRUCTION_STR:
+    dc.b    "ILLEGAL INSTRUCTION    ",0,0
+E_DIVISION_BY_ZERO_STR:
+    dc.b    "DIVISION BY ZERO       ",0,0
+E_CHK_EXCEPTION_STR:
+    dc.b    "CHK EXCEPTION          ",0,0
+E_TRAPV_EXCEPTION_STR:
+    dc.b    "TRAPV EXCEPTION        ",0,0
+E_PRIVILEGE_VIOLATION_STR:
+    dc.b    "PRIVILEGE VIOLATION    ",0,0
+E_TRACE_EXCEPTION_STR:
+    dc.b    "TRACE EXCEPTION        ",0,0
+E_LINE_A_EMULATOR_STR:
+    dc.b    "LINE A EMULATOR        ",0,0
+E_LINE_F_EMULATOR_STR:
+    dc.b    "LINE F EMULATOR        ",0,0
+E_SPURIOUS_EXCEPTION_STR: 
+    dc.b    "SPURIOUS EXCEPTION     ",0,0
+E_IRQ_STR:
+    dc.b    "IRQ                    ",0,0
+E_TRAP_EXCEPTION_STR:
+    dc.b    "TRAP_EXCEPTION         ",0,0

@@ -1,5 +1,5 @@
-DominicaPalette:	
-    dc.w	$0000	;	Color $0 is transparent (so the actual value doesn't matter)
+	; --- Palette ---
+	dc.w	$0000	;	Color $0 is transparent (so the actual value doesn't matter)
 	dc.w	$0000	;	Color $1
 	dc.w	$0226	;	Color $2
 	dc.w	$0244	;	Color $3
@@ -16,9 +16,8 @@ DominicaPalette:
 	dc.w	$00ce	;	Color $e
 	dc.w	$0eee	;	Color $f
 
-DominicaTilesStart:	
-
-    dc.l	$66666666	;	Tile (col 0, row 0)
+	; --- Tiles ---
+	dc.l	$66666666	;	Tile (col 0, row 0)
 	dc.l	$66666666
 	dc.l	$66666666
 	dc.l	$66666666
@@ -2066,88 +2065,3 @@ DominicaTilesStart:
 	dc.l	$66666666
 	dc.l	$66666666
 	dc.l	$66666666
-DominicaTilesEnd:
-
-DominicaTilesSizeB	    equ (DominicaTilesEnd-DominicaTilesStart) ; Font size in bytes
-DominicaTilesSizeW	    equ (DominicaTilesSizeB/2)                ; Font size in words
-DominicaTilesSizeL	    equ (DominicaTilesSizeB/4)                ; Font size in longs
-DominicaTilesSizeT	    equ (DominicaTilesSizeB/32)               ; Font size in tiles
-DominicaTilesVRAM	    equ $0740                                 ; Dest address in VRAM
-DominicaTilesTileID	equ (DominicaTilesVRAM/32)                    ; ID of first tile
-
-    nop     0,8
-
-DomLoadTiles:
-    move.l  #DominicaTilesVRAM,-(sp) ; d0 - VRAM address
-    jsr     _VDPWriteVramMode
-    addq.l  #4,sp
-    move.l  #DominicaTilesSizeT,d1  ; d1 - Num chars in tiles
-    subq.b  #1,d1                   ; Num chars - 1
-    lea     DominicaTilesStart,a0   ; a0 - Font address
-DomLoadTilesCopy:
-    move.w  #8,d2                   ; 8 longwords in tile
-    subq.b  #1,d2                   ; - 1 for loop
-DomLoadTilesLongCopy:
-    move.l  (a0)+,VDP_DATA_PORT     ; Copy one line of tile to VDP data port
-    dbra    d2,DomLoadTilesLongCopy
-    dbra    d1,DomLoadTilesCopy
-    rts
-
-DomOnPlaneA:
-    ; Setup VRAM Write
-    move.l  #$C120,-(sp)
-    jsr     _VDPWriteVramMode
-    addq.l  #4,sp
-    ; d0: Tile ID
-    move.l  #DominicaTilesTileID,d0
-    ; d1: Tile Count
-    move.l  #DominicaTilesSizeT,d1
-    subq.l  #1,d1
-    ; d2: Palette
-    move.l  #1,d2
-    ror.w   #3,d2
-    ; d3: current column index
-    clr.w   d3
-_DomOnPlaneA_Next:
-    ; Create data word
-    clr.w   d7
-    or.w    d0,d7
-    or.w    d2,d7
-    move.w  d7,VDP_DATA_PORT 
-    addq.w  #1,d0
-    addq.w  #1,d3
-    cmpi.w  #16,d3
-    bne     _DomOnPlaneA_SkipBlankLine
-    ; Insert Blank Line
-    move.l  #47,d6
-_DomOnPlaneA_BlankLine_Next:
-    move.w  #0,VDP_DATA_PORT
-    dbra    d6,_DomOnPlaneA_BlankLine_Next
-    clr.w   d3
-_DomOnPlaneA_SkipBlankLine:
-    dbra    d1,_DomOnPlaneA_Next
-	rts
-
-DomPushPalette:
-    ; Set autoincrement to 2 bytes
-    move.l  #2,-(sp)
-    jsr     _VDPSetAutoIncrement
-	addq.l  #4,sp
-
-    ; Set up VDP to write to CRAM address $0000
-    move.l  #$0020,-(sp)
-    jsr     _VDPWriteCramMode
-    addq.l  #4,sp
-
-    ; Load address of Palette into a0
-    lea     DominicaPalette,a0               
-    ; 32 bytes of data (8 longwords, minus 1 for counter) in palette
-    move.l  #8,d0                  
-    subq.l  #1,d0                  
-
-_PushDomPaletteLoop:
-    ; Move data to VDP data port, and increment source address
-    move.l  (a0)+,VDP_DATA_PORT        
-    dbra    d0,_PushDomPaletteLoop
-
-    rts
