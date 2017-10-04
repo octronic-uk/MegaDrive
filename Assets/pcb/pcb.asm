@@ -557,22 +557,22 @@ PCBLoadTilesLongCopy:
     dbra    d1,PCBLoadTilesCopy
     rts
 
-PCBOnPlaneA:
+PCBOnPlane:
     ; Setup VRAM Write
     movea.l  4(sp),a0
-_PCB_On_PlaneA_Set_Address:
+_PCB_On_Plane_Set_Address:
     move.l  a0,-(sp)
     jsr     _VDPWriteVramMode
     addq.l  #4,sp
-_PCB_On_PlaneA_Setup_Loop:
+_PCB_On_Plane_Setup_Loop:
     ; d0: Tile ID
     move.l  #PCBTilesTileID,d0
     move.l  #8,d1 ; X Index
     subq.l  #1,d1
-_PCB_On_PlaneA_Loop_X:
+_PCB_On_Plane_Loop_X:
     move.l  #8,d2 ; Y Index
     subq.l  #1,d2
-_PCB_On_PlaneA_Loop_Y:
+_PCB_On_Plane_Loop_Y:
     ; d3: Palette
     move.l  #1,d3
     ror.w   #3,d3
@@ -581,7 +581,7 @@ _PCB_On_PlaneA_Loop_Y:
     or.w    d3,d7
     move.w  d7,VDP_DATA_PORT 
     addq.w  #1,d0   ; Advance Tile ID
-    dbra d2,_PCB_On_PlaneA_Loop_Y
+    dbra d2,_PCB_On_Plane_Loop_Y
     ; Advance Line
     add.l   #128,a0
     movem.l d0-d7/a0,-(sp)
@@ -589,7 +589,7 @@ _PCB_On_PlaneA_Loop_Y:
     jsr     _VDPWriteVramMode
     addq.l  #4,sp
     movem.l (sp)+,d0-d7/a0
-    dbra d1,_PCB_On_PlaneA_Loop_X
+    dbra d1,_PCB_On_Plane_Loop_X
 	rts
 
 PCBPushPalette:
@@ -614,4 +614,19 @@ _PushPCBPaletteLoop:
     move.l  (a0)+,VDP_DATA_PORT        
     dbra    d0,_PushPCBPaletteLoop
 
+    rts
+
+PCBDrawRow:
+    move.l  4(sp),a0 ; Get start address into a0
+    move.l  a0,a1    ; Setup End Address in a1
+    add.l   #$80,a1  ; to be a0 + $60
+PCBDrawRowLoop:
+    movem.l  d0/a0-a1,-(sp) ; Cache Registers
+    move.l  a0,-(sp)        ; Push Address Param
+    jsr     PCBOnPlane      ; Draw PCB
+    addq.l  #4,sp           ; Correct Stack
+    movem.l  (sp)+,d0/a0-a1 ; Restore Registers
+    add.l   #$10,a0         ; Add 16 to draw address
+    cmp.l   a0,a1           ; Compare with limit
+    bgt     PCBDrawRowLoop  ; Are we there yet?
     rts
