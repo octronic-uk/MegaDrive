@@ -64,7 +64,6 @@ _VDPCreateCmdWord:
     rol.l   #2,d2           ; Shift bits 31,30 into 1,0
     andi.l  #$3FFF0000,d0   ; Zero out bits 31,30
     or.l    d2,d0           ; Or result to get address layout
-
     ; Format Command
     move.l  d1,d2           ; Temp store in d2
     ror.l   #2,d2           ; Shift bits 1,0 into 31,30
@@ -87,6 +86,20 @@ _VDPWriteVramMode:
     addq.l  #8,sp
     move.l  d0,VDP_CTRL_PORT
     rts
+
+; Setup for a write to VertivalScroll RAM at the given address
+;   move.l  #ADDRESS,-(sp)
+;   jsr     _VDPWriteVramMode
+;   addq.l  #4,sp
+_VDPWriteVSramMode:
+    move.l  4(sp),d0
+    move.l  #VDP_VSRAM_WRITE,-(sp)
+    move.l  d0,-(sp)
+    jsr     _VDPCreateCmdWord
+    addq.l  #8,sp
+    move.l  d0,VDP_CTRL_PORT
+    rts
+
 
 ; Setup for a write to Colour RAM at the given address
 ;   move.l  #ADDRESS,-(sp)

@@ -87,7 +87,7 @@
 	dc.w    $0000                                              ; Checksum
 	dc.b    'J               '                                 ; I/O support
 	dc.l    ROM_START                                          ; Start address of ROM
-	dc.l    __end                                              ; End address of ROM
+	dc.l    __end-1                                            ; End address of ROM
 	dc.l    RAM_START                                          ; Start address of RAM
 	dc.l    RAM_END                                            ; End address of RAM
 	dc.l    $00000000                                          ; SRAM enabled
@@ -97,7 +97,7 @@
 	dc.l    $00000000                                          ; Unused
 	dc.l    $00000000                                          ; Unused
 	dc.b    '                                        '         ; Notes (unused)
-	dc.b    'E               '                                 ; Country codes
+	dc.b    '  E             '                                 ; Country codes
 ; All this crap Should be $200 long
 
 _EntryPoint: ; -----------------------------------------------------------------
@@ -157,9 +157,6 @@ _Header_Clear_VRAM_Loop:
 	move.w  d0,$C00000	                ; Write 0 to the data port.
 	dbra    d7,_Header_Clear_VRAM_Loop	; Clear the VRAM.
     rts
-
-
-
 
 _Header_PortC_Ok:
 	bsr.w   _Header_Z80Init		; Initialize the Z80.
@@ -298,6 +295,9 @@ E_Trap:
     jmp     ExceptionMsg
 
 ExceptionMsg:
+    move.l  #2,-(sp)
+    jsr     _VDPSetAutoIncrement
+    addq.l  #4,sp
     move.l  #_PixelFontTileID,-(sp) ; First font tile
     move.l  #$0001,-(sp)            ; X,Y
     move.l  #$0,-(sp)               ; Palette Index
@@ -334,30 +334,30 @@ PSGData:
 
 ; VDP Initial Values ----------------------------------------------------------- 
 VDPRegisters: 
-    dc.b $04 ; $00: Horiz. interrupt on, plus bit 2 (unknown, but docs say it needs to be on) 
-    dc.b $6C ; $01: Vert. interrupt on, display on, DMA on, V28 mode (28 cells vertically), + bit 2 
-    dc.b $30 ; $02: Pattern table for Scroll Plane A at $C000 (bits 3-5) 
-    dc.b $40 ; $03: Pattern table for Window Plane at $10000 (bits 1-5) 
-    dc.b $05 ; $04: Pattern table for Scroll Plane B at $A000 (bits 0-2) 
-    dc.b $70 ; $05: Sprite table at $E000 (bits 0-6) 
-    dc.b $00 ; $06: Unused 
-    dc.b $00 ; $07: Background colour - bits 0-3 = colour, bits 4-5 = palette
-    dc.b $00 ; $08: Unused
-    dc.b $00 ; $09: Unused
-    dc.b $00 ; $0A/10: Frequency of Horiz. interrupt in Rasters (number of lines travelled by the beam)
-    dc.b $00 ; $0B/11: External interrupts on, V/H scrolling on
-    dc.b $81 ; $0C/12: Shadows and highlights off, interlace off, H40 mode (40 cells horizontally)
-    dc.b $34 ; $0D/13: Horiz. scroll table at $D000 (bits 0-5)
-    dc.b $00 ; $0E/14: Unused
-    dc.b $00 ; $0F/15: Autoincrement off
-    dc.b $01 ; $10/16: Vert. scroll 32, Horiz. scroll 64
-    dc.b $00 ; $11/17: Window Plane X pos 0 left (pos in bits 0-4, left/right in bit 7)
-    dc.b $00 ; $12/18: Window Plane Y pos 0 up (pos in bits 0-4, up/down in bit 7)
-    dc.b $00 ; $13/19: DMA length lo byte
-    dc.b $00 ; $14/20: DMA length hi byte
-    dc.b $00 ; $15/21: DMA source address lo byte
-    dc.b $00 ; $16/22: DMA source address mid byte
-    dc.b $00 ; $17/23: DMA source address hi byte, memory-to-VRAM mode (bits 6-7)
+    dc.b $14 ; 0:  H interrupt on, palettes on
+    dc.b $74 ; 1:  V interrupt on, display on, DMA on, Genesis mode on
+    dc.b $30 ; 2:  Pattern table for Scroll Plane A at VRAM $C000 (bits 3-5 = bits 13-15)
+    dc.b $00 ; 3:  Pattern table for Window Plane at VRAM $0000 (disabled) (bits 1-5 = bits 11-15)
+    dc.b $07 ; 4:  Pattern table for Scroll Plane B at VRAM $E000 (bits 0-2 = bits 11-15)
+    dc.b $78 ; 5:  Sprite table at VRAM $F000 (bits 0-6 = bits 9-15)
+    dc.b $00 ; 6:  Unused
+    dc.b $00 ; 7:  Background colour - bits 0-3 = colour, bits 4-5 = palette
+    dc.b $00 ; 8:  Unused
+    dc.b $00 ; 9:  Unused
+    dc.b $08 ; 10: Frequency of Horiz. interrupt in Rasters (number of lines travelled by the beam)
+    dc.b $00 ; 11: External interrupts off, V scroll fullscreen, H scroll fullscreen
+    dc.b $81 ; 12: Shadows and highlights off, interlace off, H40 mode (320 x 224 screen res)
+    dc.b $3F ; 13: Horiz. scroll table at VRAM $FC00 (bits 0-5)
+    dc.b $00 ; 14: Unused
+    dc.b $02 ; 15: Autoincrement 2 bytes
+    dc.b $01 ; 16: Vert. scroll 32, Horiz. scroll 64
+    dc.b $00 ; 17: Window Plane X pos 0 left (pos in bits 0-4, left/right in bit 7)
+    dc.b $00 ; 18: Window Plane Y pos 0 up (pos in bits 0-4, up/down in bit 7)
+    dc.b $FF ; 19: DMA length lo byte
+    dc.b $FF ; 20: DMA length hi byte
+    dc.b $00 ; 21: DMA source address lo byte
+    dc.b $00 ; 22: DMA source address mid byte
+    dc.b $80 ; 23: DMA source address hi byte, memory-to-VRAM mode (bits 6-7)
 
 EXCEPTION_STRING:
     dc.b    "WHAT KIND OF FUCKERY IS THIS???",0,0

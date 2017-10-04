@@ -14,7 +14,6 @@ VDP_DATA_PORT                    equ $00C00000
 VDP_CTRL_PORT                    equ $00C00004
 VDP_HV_COUNTER                   equ $00C00008
 VDP_SN76489_PSG                  equ $00C00011
-VDP_SPRITE_TABLE                 equ $E000
 
 VDP_REG_MODE_1                   equ $00
 VDP_REG_MODE_2                   equ $01
@@ -57,3 +56,10 @@ VDP_SPRITE_Y_MAX_32              equ $15F
 VDP_SPRITE_Y_MAX_40              equ $16F
 
 VDP_FIRST_SPRITE                 equ $60000003
+
+; VDP Tables
+VDP_SCROLL_TABLE_A               equ $C000
+VDP_SCROLL_TABLE_B               equ $E000
+VDP_WINDOW_TABLE                 equ $0000
+VDP_SPRITE_TABLE                 equ $F000
+VDP_H_SCROLL_TABLE               equ $FC00

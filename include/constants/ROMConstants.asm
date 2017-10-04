@@ -23,4 +23,3 @@ CTRL_PORT_2     equ $A1000B
 CTRL_PORT_EXP   equ $A1000D    
 SEGA_STR        equ 'SEGA'
 
-

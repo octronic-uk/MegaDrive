@@ -730,7 +730,7 @@ _TextOnPlaneA:
 	;add.l    #$40000003,d3     ; Add PlaneA write cmd + address
 	;move.l   d3,VDP_CTRL_PORT  ; Send to VDP control port
 
-    add.l   #$C000,d3 
+    add.l   #VDP_SCROLL_TABLE_A,d3 
     movem.l d0-d3/a0,-(sp)
     move.l  d3,-(sp)
     jsr     _VDPWriteVramMode
@@ -754,6 +754,49 @@ _TextOnPlaneA_CharCopy:
 _TextOnPlaneA_End:
 	rts
 
+; Usage
+;   pea     STRING_ADDR
+;   move.l  #FirstTileID,-(sp)
+;   move.l  #XY,-(sp)
+;   move.l  #PALETTE,-(sp)
+;   jsr     _TextOnPlaneB
+;   addq.l  #8,sp
+;   addq.l  #8,sp
+;
+_TextOnPlaneB:
+    movea.l 16(sp),a0          ; a0 (l) - String address
+    move.l  12(sp),d0          ; d0 (w) - First tile ID of font
+    move.l  8(sp),d1           ; d1 (bb)- XY coord (in tiles)
+    move.l  4(sp),d2           ; d2 (b) - Palette
+    clr.l    d3                ; Clear d3 ready to work with
+	move.b   d1,d3             ; Move Y coord (lower byte of d1) to d3
+	mulu.w   #$0040,d3         ; Multiply Y by line width (H40 mode - 64 lines horizontally) to get Y offset
+	ror.l    #$8,d1            ; Shift X coord from upper to lower byte of d1
+	add.b    d1,d3             ; Add X coord to offset
+	mulu.w   #$2,d3            ; Convert to words
+    add.l   #VDP_SCROLL_TABLE_B,d3 
+    movem.l d0-d3/a0,-(sp)
+    move.l  d3,-(sp)
+    jsr     _VDPWriteVramMode
+    addq.l  #4,sp
+    movem.l (sp)+,d0-d3/a0
+	clr.l    d3                ; Clear d3 ready to work with again
+	move.b   d2,d3             ; Move palette ID (lower byte of d2) to d3
+	rol.l    #$8,d3            ; Shift palette ID to bits 14 and 15 of d3
+	rol.l    #$5,d3            ; Can only rol bits up to 8 places in one instruction
+	lea      CharOffsetMap,a1  ; Load address of ASCII map into a1
+_TextOnPlaneB_CharCopy:
+	move.b   (a0)+,d2               ; Move ASCII byte to lower byte of d2
+	cmp.b    #$0,d2                 ; Test if byte is zero (string terminator)
+	beq.b    _TextOnPlaneB_End      ; If byte was zero, branch to end
+	sub.b    #CharOffsetStart,d2    ; Subtract first ASCII code to get table entry index
+	move.b   (a1,d2.w),d3           ; Move tile ID from table (index in lower word of d2) to lower byte of d3
+	add.w    d0,d3                  ; Offset tile ID by first tile ID in font
+	move.w   d3,VDP_DATA_PORT       ; Move palette and pattern IDs to VDP data port
+	jmp      _TextOnPlaneB_CharCopy ; Next character
+_TextOnPlaneB_End:
+	rts
+
 _TextPalette:
    dc.w $0000 ; Colour 0 - Transparent
    dc.w $0EEE ; Colour 1 - White
@@ -771,19 +814,3 @@ _TextPalette:
    dc.w $0EEE ; Colour D - White
    dc.w $0EEE ; Colour E - White
    dc.w $0EEE ; Colour F - White
-
-   ;dc.w $008E ; Colour 7 - Orange
-   ;dc.w $000E ; Colour 1 - Red
-   ;dc.w $00E0 ; Colour 2 - Green
-   ;dc.w $0E00 ; Colour 3 - Blue
-   ;dc.w $0000 ; Colour 4 - Black
-   ;dc.w $00EE ; Colour 6 - Yellow
-   ;dc.w $0E0E ; Colour 8 - Pink
-   ;dc.w $0808 ; Colour 9 - Purple
-   ;dc.w $0444 ; Colour A - Dark grey
-   ;dc.w $0888 ; Colour B - Light grey
-   ;dc.w $0EE0 ; Colour C - Turquoise
-   ;dc.w $000A ; Colour D - Maroon
-   ;dc.w $0600 ; Colour E - Navy blue
-   ;dc.w $0060 ; Colour F - Dark green
-

@@ -34,22 +34,22 @@ if [[ ${BUILD_RESULT} == 0 ]]; then
     echo
 
     # Padd File
-    #echo "Padding rom to 1MB..."
-    #echo `pwd`
+    echo "Padding rom to 1MB..."
+    echo `pwd`
     #../tools/PadTo1M  ${PROJECT}.${_MD_ROM_EXT}
 
     # Fix Checksum
     #echo Fixing Checksum...
     #../tools/FixChecksum.py  ${PROJECT}.${_MD_ROM_EXT}
 
-    #echo
-    #echo "Running 'file and ls -la' on " ${PROJECT}.${_MD_ROM_EXT}
-    #ls -la ${PROJECT}.${_MD_ROM_EXT}
-    #file ${PROJECT}.${_MD_ROM_EXT}
-    #echo
+    echo
+    echo "Running 'file and ls -la' on " ${PROJECT}.${_MD_ROM_EXT}
+    ls -la ${PROJECT}.${_MD_ROM_EXT}
+    file ${PROJECT}.${_MD_ROM_EXT}
+    echo
 
-    #echo Running BlastEm
-    #~/software/blastem/blastem  ${PROJECT}.${_MD_ROM_EXT}
+    echo Running BlastEm
+    ~/software/blastem/blastem  ${PROJECT}.${_MD_ROM_EXT}
 
     exit 0
 else

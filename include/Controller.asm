@@ -15,7 +15,7 @@
 ; Usage
 ;   jsr     _CtrlrReadPad1D0
 ;
-_CtrlReadPad1D0:
+CtrlReadPad1D0:
     move.l #0,d0
     move.b #$00,CTRL_DATA_A  ; Put data port back to normal
     move.b CTRL_DATA_A,d0    ; Read upper byte from data port
@@ -28,7 +28,7 @@ _CtrlReadPad1D0:
 ; Usage
 ;   jsr     _CtrlrReadPad2D0
 ;
-_CtrlReadPad2D0:
+CtrlReadPad2D0:
     move.l #0,d0
     move.b #$00,CTRL_DATA_B  ; Put data port back to normal
     move.b CTRL_DATA_B,d0    ; Read upper byte from data port

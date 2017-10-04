@@ -37,9 +37,51 @@ __GameMain:
     jsr     DrawPcbRow
     addq.l  #4,sp
 
-_lewp:
-    jsr PlaneA_Scroller
-    jmp     _lewp
+
+    move.w  #0,HScrollPtr
+    move.w  #0,VScrollPtr
+
+Loop:
+    jsr     CtrlReadPad1D0
+
+    btst    #CTRL_UP,d0
+    bne     Loop_NoUp 
+    sub.w   #1,VScrollPtr
+Loop_NoUp:
+    btst    #CTRL_DOWN,d0
+    bne     Loop_NoDown
+    add.w   #1,VScrollPtr
+Loop_NoDown:
+    btst    #CTRL_LEFT,d0
+    bne     Loop_NoLeft
+    add.w   #1,HScrollPtr
+Loop_NoLeft:
+    btst    #CTRL_RIGHT,d0
+    bne     Loop_NoRight
+    sub.w   #1,HScrollPtr
+Loop_NoRight:
+
+    ; Disable Auto Increment
+    move.l  #0,-(sp)
+    jsr     _VDPSetAutoIncrement
+    addq.l  #4,sp
+    ; Update H
+    move.l  #VDP_H_SCROLL_TABLE,-(sp)
+    jsr     _VDPWriteVramMode
+    addq.l  #4,sp
+    jsr     _VDPWaitVBlankEnd
+    move.w  HScrollPtr,VDP_DATA_PORT
+    ; Update V 
+    move.l  #0,-(sp)
+    jsr     _VDPWriteVSramMode
+    addq.l  #4,sp
+    jsr     _VDPWaitVBlankEnd
+    move.w  VScrollPtr,VDP_DATA_PORT
+    ; Wait value
+    move.w  #$02FF,d0
+Loop_Wait:
+    dbra    d0,Loop_Wait
+    jmp     Loop
 
 DrawPcbRow:
     move.l  4(sp),a0 ; Get start address into a0
@@ -56,27 +98,19 @@ DrawPcbRowLoop:
     bgt     DrawPcbRowLoop  ; Are we there yet?
     rts
 
-PlaneA_Scroller:
-    ; Disable Auto Increment
-    move.l  #0,-(sp)
+DrawOnPlaneB:
+    move.l  #2,-(sp)
     jsr     _VDPSetAutoIncrement
     addq.l  #4,sp
-    ; Setup to write to D000, HScroll Table
-    move.l  #$D000,-(sp)
-    jsr     _VDPWriteVramMode
-    addq.l  #4,sp
-    move.w  #$FFF,d0
-
-PlaneA_Scroller_Next:
-    move.l  d0,-(sp)
-    jsr     _VDPWaitVBlankEnd
-    move.l  (sp)+,d0
-    move.w  d0,VDP_DATA_PORT
-
-    move.w  #$06FF,d1
-PlaneA_Scroller_Wait:
-    dbra    d1,PlaneA_Scroller_Wait
-    dbra    d0,PlaneA_Scroller_Next
-    rts
+    pea     EXCEPTION_STRING        ; String
+    move.l  #_PixelFontTileID,-(sp) ; First font tile
+    move.l  #$0000,-(sp)            ; X,Y
+    move.l  #$0,-(sp)               ; Palette Index
+    jsr     _TextOnPlaneB
+    add.l   #16,sp
+    rts  
 
 __end    ; Very last line, end of ROM address
+
+HScrollPtr  equ RAM_START
+VScrollPtr  equ RAM_START+2
