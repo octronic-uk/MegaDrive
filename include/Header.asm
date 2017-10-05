@@ -122,7 +122,7 @@ _Header_Clear_RAM_Loop:
 	dbra    d0,_Header_Clear_RAM_Loop	; Continue clearing RAM if there's anything left.
 
     move.l  #2,-(sp) 
-    jsr     _VDPSetAutoIncrement
+    jsr     VDPSetAutoIncrement
     addq.l  #4,sp
 
     jsr     _Header_Clear_VRAM       
@@ -296,7 +296,7 @@ E_Trap:
 
 ExceptionMsg:
     move.l  #2,-(sp)
-    jsr     _VDPSetAutoIncrement
+    jsr     VDPSetAutoIncrement
     addq.l  #4,sp
     move.l  #_PixelFontTileID,-(sp) ; First font tile
     move.l  #$0001,-(sp)            ; X,Y

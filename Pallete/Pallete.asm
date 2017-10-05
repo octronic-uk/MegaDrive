@@ -17,17 +17,17 @@ _PushPallete:
 
     ; Setup VRAM write to $C000
     move.l  #$C000,-(sp)
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
 
     ; Set autoincrement to 2 bytes
     move.l  #2,-(sp)
-    jsr     _VDPSetAutoIncrement
+    jsr     VDPSetAutoIncrement
 	addq.l  #4,sp
 
     ; Set up VDP to write to CRAM address $0000
     move.l  #$0000,-(sp)
-    jsr     _VDPWriteCramMode
+    jsr     VDPWriteCramMode
     addq.l  #4,sp
 
     ; Load address of Palette into a0
@@ -46,7 +46,7 @@ _PushChars:
     ; Set up VDP to write to VRAM address $0020
     ;move.l  #$40200000,VDP_CTRL_PORT  
     move.l  #$0020,-(sp)
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
     ; Load address of Characters into a0
     lea     Characters,a0         
@@ -63,7 +63,7 @@ _DrawChars:
     ; Low plane, palette 0, no flipping, plus tile ID...
     ;move.l  #$40000003,VDP_CTRL_PORT  
     move.l  #$C000,-(sp)
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
 
     move.w  #$0001,VDP_DATA_PORT      ; Pattern ID 1 - H

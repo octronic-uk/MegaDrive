@@ -543,7 +543,7 @@ PCBTilesTileID	    equ (PCBTilesVRAM/32)           ; ID of first tile
 
 PCBLoadTiles:
     move.l  #PCBTilesVRAM,-(sp)     ; d0 - VRAM address
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
     move.l  #PCBTilesSizeT,d1       ; d1 - Num chars in tiles
     subq.b  #1,d1                   ; Num chars - 1
@@ -562,7 +562,7 @@ PCBOnPlane:
     movea.l  4(sp),a0
 _PCB_On_Plane_Set_Address:
     move.l  a0,-(sp)
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
 _PCB_On_Plane_Setup_Loop:
     ; d0: Tile ID
@@ -586,7 +586,7 @@ _PCB_On_Plane_Loop_Y:
     add.l   #128,a0
     movem.l d0-d7/a0,-(sp)
     move.l  a0,-(sp)
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
     movem.l (sp)+,d0-d7/a0
     dbra d1,_PCB_On_Plane_Loop_X
@@ -595,12 +595,12 @@ _PCB_On_Plane_Loop_Y:
 PCBPushPalette:
     ; Set autoincrement to 2 bytes
     move.l  #2,-(sp)
-    jsr     _VDPSetAutoIncrement
+    jsr     VDPSetAutoIncrement
 	addq.l  #4,sp
 
     ; Set up VDP to write to CRAM address $0000
     move.l  #$0020,-(sp)
-    jsr     _VDPWriteCramMode
+    jsr     VDPWriteCramMode
     addq.l  #4,sp
 
     ; Load address of Palette into a0

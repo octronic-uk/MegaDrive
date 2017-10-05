@@ -68,19 +68,19 @@ Loop_NoRight:
 
     ; Disable Auto Increment
     move.l  #0,-(sp)
-    jsr     _VDPSetAutoIncrement
-    addq.l  #4,sp
+    jsr     VDPSetAutoIncrement
+    addq.l  #VDP_SET_AUTO_INCREMENT_ALIGN,sp
     ; Update H
     move.l  #VDP_H_SCROLL_TABLE,-(sp)
-    jsr     _VDPWriteVramMode
-    addq.l  #4,sp
-    jsr     _VDPWaitVBlankEnd
+    jsr     VDPWriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
+    jsr     VDPWaitVBlankEnd
     move.w  HScrollPtr,VDP_DATA_PORT
     ; Update V 
     move.l  #0,-(sp)
-    jsr     _VDPWriteVSramMode
-    addq.l  #4,sp
-    jsr     _VDPWaitVBlankEnd
+    jsr     VDPWriteVSramMode
+    addq.l  #VDP_WRITE_VSRAM_MODE_ALIGN,sp
+    jsr     VDPWaitVBlankEnd
     move.w  VScrollPtr,VDP_DATA_PORT
     ; Wait value
     move.w  #$08FF,d0
@@ -88,7 +88,8 @@ Loop_Wait:
     dbra    d0,Loop_Wait
     jmp     Loop
 
-__end    ; Very last line, end of ROM address
 
 HScrollPtr  equ RAM_START
 VScrollPtr  equ RAM_START+2
+
+__end    ; Very last line, end of ROM address

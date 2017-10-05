@@ -5,57 +5,79 @@
 ;   \/_/\/_/ \/_____/ \/_/\/_/
 ;      ash@octronic.co.uk
 ;
-; VDP.asm - Useful VDP Definitions
+; VDP.asm - Useful VDP Routines
 ;
 ;   See http://md.squee.co/VDP
 ;
 
 
 ; Read the VDP status register into d0
-_VDPReadStatusD0:
+;   Usage
+;       jsr VDPReadStatusD0
+;   Uses
+;       d0
+;   Returns
+;       d0: VDP Status
+VDPReadStatusD0:
     andi.l  #00000000,d0
     move.w  VDP_CTRL_PORT,d0
     rts
     
 ; VDP Set Auto Increment Value
-;   move.l #AI_VALUE,-(sp) 
-;   jsr _VDPSetAutoIncrement
-_VDPSetAutoIncrement:
+;   Usage
+;       move.l #AI_VALUE,-(sp) 
+;       jsr VDPSetAutoIncrement
+;       addq.l  #VDP_SET_AUTO_INCREMENT_ALIGN,sp
+VDP_SET_AUTO_INCREMENT_ALIGN  equ 4
+VDP_SET_AUTO_INCREMENT_ARG    equ 4
+VDPSetAutoIncrement:
     move.l   #VDP_REG_AUTO_INCREMENT,-(sp)   ; AI Register
-    move.l   8(sp),-(sp) ; AI Value ( 8(sp) as we jump over return address)
-    jsr _VDPWriteRegister
-    addq.l   #8,sp
+    move.l   VDP_SET_AUTO_INCREMENT_ARG(sp),-(sp) ; AI Value ( 8(sp) as we jump over return address)
+    jsr VDPWriteRegister
+    addq.l   #VDP_WRITE_REGISTER_ALIGN,sp
     rts
 
 ; VDP Write Register
 ;
-; Data Format
-;   1, 0, ?, R4,R3,R2,R1,R0
-;   D7,D6,D5,D4,D3,D2,D1,D0
-; Usage
-;    move.l #register,-(sp)
-;    move.l #data,-(sp)
-;
-_VDPWriteRegister:
-    move.l  4(sp),d0           ; VDP Data
-    move.l  8(sp),d1           ; VDP Register
-    ori.b   #$80,d1            ; Register mask
-    lsl     #8,d1              ; Shift to byte 2
-    or.w    d1,d0              ; Or Register with Data
-    move.w  d0,VDP_CTRL_PORT   ; Write to VDP
+;   Data Format
+;       1, 0, ?, R4,R3,R2,R1,R0
+;       D7,D6,D5,D4,D3,D2,D1,D0
+;   Usage
+;       move.l #register,-(sp)
+;       move.l #data,-(sp)
+;       jsr VDPWriteRegister
+;       addq.l  #VDP_WRITE_REGISTER_ALIGN,sp
+;   Uses
+;       d0,d1
+VDP_WRITE_REGISTER_ALIGN    equ 8
+VDP_WRITE_REG_REG_ARG       equ 8
+VDP_WRITE_REG_DATA_ARG      equ 4 
+VDPWriteRegister:
+    move.l  VDP_WRITE_REG_DATA_ARG(sp),d0   ; VDP Data
+    move.l  VDP_WRITE_REG_REG_ARG(sp),d1    ; VDP Register
+    ori.b   #$80,d1                         ; Register mask
+    lsl     #8,d1                           ; Shift to byte 2
+    or.w    d1,d0                           ; Or Register with Data
+    move.w  d0,VDP_CTRL_PORT                ; Write to VDP
     rts
 
 ; Calculates the correct command word for RAM access
-;   move.l  #Command,-(sp)
-;   move.l  #Address,-(sp)
-;   jsr     _VDPCreateCmdWord
-;   addi.l  #8,sp
-;   
-;   Result in d0
-_VDPCreateCmdWord:
+;   Usage
+;       move.l  #Command,-(sp)
+;       move.l  #Address,-(sp)
+;       jsr     VDPCreateCmdWord
+;       addq.l  #VDP_CREATE_CMD_WORD_ALIGN ,sp
+;   Uses
+;       d0,d1,d2   
+;   Returns
+;       d0: Formatted VDP Command Word
+VDP_CREATE_CMD_WORD_ALIGN   equ 8
+VDP_CREATE_CMD_WORD_CMD     equ 8
+VDP_CREATE_CMD_WORD_ADDR    equ 4
+VDPCreateCmdWord:
     ; Store Args
-    move.l  4(sp),d0        ; Address in d0
-    move.l  8(sp),d1        ; Command in d1
+    move.l  VDP_CREATE_CMD_WORD_ADDR(sp),d0 ; Address in d0
+    move.l  VDP_CREATE_CMD_WORD_CMD(sp),d1  ; Command in d1
     ; Format Adderss
     swap    d0              ; Move address to upper word
                             ; Create bits 1,0 in d2
@@ -76,40 +98,51 @@ _VDPCreateCmdWord:
 
 ; Setup for a write to Video RAM at the given address
 ;   move.l  #ADDRESS,-(sp)
-;   jsr     _VDPWriteVramMode
-;   addq.l  #4,sp
-_VDPWriteVramMode:
-    move.l  4(sp),d0
+;   jsr     VDPWriteVramMode
+;   addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
+VDP_WRITE_VRAM_MODE_ALIGN equ 4
+VDP_WRITE_VRAM_MODE_ADDR  equ 4
+VDPWriteVramMode:
+    move.l  VDP_WRITE_VRAM_MODE_ADDR(sp),d0
     move.l  #VDP_VRAM_WRITE,-(sp)
     move.l  d0,-(sp)
-    jsr     _VDPCreateCmdWord
+    jsr     VDPCreateCmdWord
     addq.l  #8,sp
     move.l  d0,VDP_CTRL_PORT
     rts
 
 ; Setup for a write to VertivalScroll RAM at the given address
-;   move.l  #ADDRESS,-(sp)
-;   jsr     _VDPWriteVramMode
-;   addq.l  #4,sp
-_VDPWriteVSramMode:
-    move.l  4(sp),d0
+;   Usage
+;       move.l  #ADDRESS,-(sp)
+;       jsr     VDPWriteVramMode
+;       addq.l  #VDP_WRITE_VSRAM_MODE_ALIGN4,sp
+;   Uses
+;       d0
+VDP_WRITE_VSRAM_MODE_ALIGN  equ 4
+VDP_WRITE_VSRAM_MODE_ADDR   equ 4
+VDPWriteVSramMode:
+    move.l  VDP_WRITE_VSRAM_MODE_ADDR(sp),d0
     move.l  #VDP_VSRAM_WRITE,-(sp)
     move.l  d0,-(sp)
-    jsr     _VDPCreateCmdWord
+    jsr     VDPCreateCmdWord
     addq.l  #8,sp
     move.l  d0,VDP_CTRL_PORT
     rts
 
-
 ; Setup for a write to Colour RAM at the given address
-;   move.l  #ADDRESS,-(sp)
-;   jsr     _VDPWriteCRAM
-;   addq.l  #4,sp
-_VDPWriteCramMode:
-    move.l  4(sp),d0
+;   Usage
+;       move.l  #ADDRESS,-(sp)
+;       jsr     VDPWriteCRAM
+;       addq.l  #VDP_WRITE_CRAM_MODE_ALIGN,sp
+;   Uses
+;       d0
+VDP_WRITE_CRAM_MODE_ALIGN   equ 4
+VDP_WRITE_CRAM_MODE_ADDR    equ 4
+VDPWriteCramMode:
+    move.l  VDP_WRITE_CRAM_MODE_ADDR(sp),d0
     move.l  #VDP_CRAM_WRITE,-(sp)
     move.l  d0,-(sp)
-    jsr     _VDPCreateCmdWord
+    jsr     VDPCreateCmdWord
     move.l  d0,VDP_CTRL_PORT
     addq.l  #8,sp
     rts
@@ -122,31 +155,40 @@ _VDPWriteCramMode:
 ; |x |x | x| x|	B| B| B| x| G| G| G| x| R| R| R| x|
 ; +-----------------------------------------------+
 ;
-; Usage
-;   move.w  #RED,-(sp)
-;   move.w  #GREEN,-(sp)
-;   move.w  #BLUE,-(sp)
-;   jsr     _VDPRedGreenBlueD0
-;   addq.l  #6,sp 
-;   Result in d0.w
-;
-_VDPCreateRgbD0:
-    move.w  4(sp),d2 ; Blue
+;   Usage
+;       move.w  #RED,-(sp)
+;       move.w  #GREEN,-(sp)
+;       move.w  #BLUE,-(sp)
+;       jsr     VDPRedGreenBlueD0
+;       addq.l  #VDP_CREATE_RGB_ALIGN,sp 
+;   Uses
+;       d2,d1,d0
+;   Reurns 
+;       d0: Formatted RGB Word
+VDP_CREATE_RGB_ALIGN    equ 6
+VDP_CREATE_RGB_RED      equ 8 
+VDP_CREATE_RGB_GREEN    equ 6 
+VDP_CREATE_RGB_BLUE     equ 4 
+VDPCreateRgbD0:
+    move.w  VDP_CREATE_RGB_BLUE(sp),d2 ; Blue
     rol.w   #7,d2
     rol.w	#2,d2 
-    move.w  6(sp),d1 ; Green
+    move.w  VDP_CREATE_RGB_GREEN(sp),d1 ; Green
     rol.w   #5,d1 
-    move.w  8(sp),d0 ; Red
+    move.w  VDP_CREATE_RGB_RED(sp),d0 ; Red
     rol.w   #1,d0
     or.w    d1,d0
     or.w    d2,d0
     rts
 
-; Usage
-;   pea     SPRITE_DATA_ADDRESS
-;   jsr     _VDPLoadSpriteTable
-;   addq.l  #4,sp
-_VDPLoadSpriteTable:
+;   Usage
+;       pea     SPRITE_DATA_ADDRESS
+;       jsr     VDPLoadSpriteTable
+;       addq.l  #VDP_LOAD_SPRITE_TABLE_ALIGN,sp
+;   Uses
+;       d0,a0
+VDP_LOAD_SPRITE_TABLE_ALIGN equ 4
+VDPLoadSpriteTable:
     movea.l 4(sp),a0
     move.l  (a0)+,VDP_DATA_PORT
     move.l  (a0)+,VDP_DATA_PORT
@@ -156,63 +198,105 @@ _VDPLoadSpriteTable:
 ;   move.l  #SPRITE_DEF_ADDRESS,-(sp)
 ;   move.l  #X,-(sp)
 ;   move.l  #Y,-(sp)
-;   jsr     _VDPSetSpriteXY
+;   jsr     VDPSetSpriteXY
 ;   addq.l  #$C,sp
-_VDPSetSpriteXY:
+VDPSetSpriteXY:
     ; Args
     move.l  8(sp),d0  ; X
     move.l  12(sp),d2 ; Sprite Address
     ; Set X
     move.l  d2,-(sp)
     move.l  d0,-(sp)
-    jsr     _VDPSetSpriteX
+    jsr     VDPSetSpriteX
     addq.l  #8,sp
     move.l  4(sp),d1  ; Y
     move.l  12(sp),d2 ; Sprite Address
     ; Set Y
     move.l  d2,-(sp) ; Set Y 
     move.l  d1,-(sp) ; Set Y 
-    jsr     _VDPSetSpriteY
+    jsr     VDPSetSpriteY
     addq.l  #8,sp
     rts
 
-; Usage
-;   move.l  #SPRITE_DEF_ADDRESS,-(sp)
-;   move.l  #X,-(sp)
-;   jsr     _VDPSetSpriteX
-;   addq.l  #$C,sp
-_VDPSetSpriteX:
+;   Usage
+;       move.l  #SPRITE_DEF_ADDRESS,-(sp)
+;       move.l  #X,-(sp)
+;       jsr     VDPSetSpriteX
+;       addq.l  #VDP_SET_SPRITE_X_ALIGN,sp
+;   Uses
+;       d0,d1
+VDP_SET_SPRITE_X_ALIGN  equ 8
+VDPSetSpriteX:
     move.l  8(sp),d0
     addq.l  #$6,d0
     move.l  d0,-(sp)
-    jsr     _VDPWriteVramMode
-    addq.l  #4,sp
+    jsr     VDPWriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
     move.l  4(sp),d1
     move.w  d1,VDP_DATA_PORT
     rts
 
-; Usage
-;   move.l  #SPRITE_DEF_ADDRESS,-(sp)
-;   move.l  #Y,-(sp)
-;   jsr     _VDPSetSpriteY
-;   addq.l  #$C,sp
-_VDPSetSpriteY:
+;   Usage
+;       move.l  #SPRITE_DEF_ADDRESS,-(sp)
+;       move.l  #Y,-(sp)
+;       jsr     VDPSetSpriteY
+;       addq.l  #VDP_SET_SPRITE_Y_ALIGN,sp
+;   Uses
+;      d1 
+VDP_SET_SPRITE_Y_ALIGN  equ 12
+VDPSetSpriteY:
     move.l  8(sp),-(sp)
-    jsr     _VDPWriteVramMode
-    addq.l  #4,sp
+    jsr     VDPWriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
     move.l  4(sp),d1
     move.w  d1,VDP_DATA_PORT
     rts
 
-_VDPWaitVBlankStart:
+;   Usage
+;       jsr     VDPWaitVBlankStart
+;   Uses
+;
+VDPWaitVBlankStart:
    move.w   VDP_CTRL_PORT,d0    ; Move VDP status word to d0
    andi.w   #$0008,d0           ; AND with bit 4 (vblank), result in status register
-   bne      _VDPWaitVBlankStart ; Branch if not equal (to zero)
+   bne      VDPWaitVBlankStart ; Branch if not equal (to zero)
    rts
  
-_VDPWaitVBlankEnd:
+;   Usage
+;       jsr     VDPWaitVBlankEnd
+;   Uses
+;       d0
+VDPWaitVBlankEnd:
    move.w   VDP_CTRL_PORT,d0     ; Move VDP status word to d0
    andi.w   #$0008,d0            ; AND with bit 4 (vblank), result in status register
-   beq       _VDPWaitVBlankEnd   ; Branch if equal (to zero)
+   beq       VDPWaitVBlankEnd   ; Branch if equal (to zero)
    rts
 
+VDP_LOAD_PALETTE_ALIGN    equ 8
+VDP_LOAD_PALETTE_SRC      equ 8
+VDP_LOAD_PALETTE_DEST     equ 4
+;   Usage
+;       pea     YOUR_PALETTE
+;       move.l  #PALETTE_VRAM_DEST,-(sp)
+;       jsr     VDPLoadPalette
+;       addq.l  #VDP_LOAD_PALETTE_ALIGN,sp
+;   Uses
+;       d0/a0
+VDPLoadPalette:
+    ; Set autoincrement to 2 bytes
+    move.l  #2,-(sp)
+    jsr     VDPSetAutoIncrement
+	addq.l  #VDP_SET_AUTO_INCREMENT_ALIGN,sp
+    ; Set up VDP to write to CRAM address
+    move.l  VDP_LOAD_PALETTE_DEST(sp),-(sp)
+    jsr     VDPWriteCramMode
+    addq.l  #VDP_WRITE_CRAM_MODE_ALIGN,sp
+    ; Load address of Palette into a0
+    lea     VDP_LOAD_PALETTE_SRC(sp),a0               
+    ; 32 bytes of data (8 longwords, minus 1 for counter) in palette
+    move.l  #$07,d0                  
+_VDPLoadPalette_Loop:
+    ; Move data to VDP data port, and increment source address
+    move.l  (a0)+,VDP_DATA_PORT        
+    dbra    d0,_VDPLoadPalette_Loop
+    rts

@@ -661,18 +661,16 @@ _PixelFontSizeT	    equ (_PixelFontSizeB/32)            ; Font size in tiles
 _PixelFontVRAM	    equ $0100                           ; Dest address in VRAM
 _PixelFontTileID	equ (_PixelFontVRAM/32)             ; ID of first tile
 
-    nop     0,8
-
 _TextLoadFont:
 
     ; Set autoincrement to 2 bytes
     move.l  #2,-(sp)
-    jsr     _VDPSetAutoIncrement
+    jsr     VDPSetAutoIncrement
 	addq.l  #4,sp
 
     ; Set up VDP to write to CRAM address $0000
     move.l  #$0000,-(sp)
-    jsr     _VDPWriteCramMode
+    jsr     VDPWriteCramMode
     addq.l  #4,sp
 
     ; Load address of Palette into a0
@@ -688,7 +686,7 @@ _PushPaletteLoop:
 
 
     move.l  #_PixelFontVRAM,-(sp) ; d0 - VRAM address
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
 
     move.l  #_PixelFontSizeT,d1   ; d1 - Num chars in tiles
@@ -733,7 +731,7 @@ _TextOnPlaneA:
     add.l   #VDP_SCROLL_TABLE_A,d3 
     movem.l d0-d3/a0,-(sp)
     move.l  d3,-(sp)
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
     movem.l (sp)+,d0-d3/a0
 
@@ -777,7 +775,7 @@ _TextOnPlaneB:
     add.l   #VDP_SCROLL_TABLE_B,d3 
     movem.l d0-d3/a0,-(sp)
     move.l  d3,-(sp)
-    jsr     _VDPWriteVramMode
+    jsr     VDPWriteVramMode
     addq.l  #4,sp
     movem.l (sp)+,d0-d3/a0
 	clr.l    d3                ; Clear d3 ready to work with again

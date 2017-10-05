@@ -57,12 +57,13 @@ VicViper_U2_Tiles_Start:
 	dc.l	$00000000
 VicViper_U2_Tiles_End:
 
-VicViper_U2_VRAM    equ $0020
-VicViper_U2_SizeB   equ (VicViper_U2_Tiles_End-VicViper_U2_Tiles_Start) ; Sprite size in bytes
-VicViper_U2_SizeW   equ (VicViper_U2_SizeB/2)           ; Sprite size in words
-VicViper_U2_SizeL   equ (VicViper_U2_SizeB/4)           ; Sprite size in longs
-VicViper_U2_SizeT   equ (VicViper_U2_SizeB/32)          ; Sprite size in tiles
-VicViper_U2_TileID  equ (VicViper_U2_VRAM/32)           ; ID of first tile
+VicViper_U2_VRAM     equ VicViper_U1_VRAM_End
+VicViper_U2_SizeB    equ (VicViper_U2_Tiles_End-VicViper_U2_Tiles_Start)    ; Sprite size in bytes
+VicViper_U2_SizeW    equ (VicViper_U2_SizeB/2)                              ; Sprite size in words
+VicViper_U2_SizeL    equ (VicViper_U2_SizeB/4)                              ; Sprite size in longs
+VicViper_U2_SizeT    equ (VicViper_U2_SizeB/32)                             ; Sprite size in tiles
+VicViper_U2_TileID   equ (VicViper_U2_VRAM/32)                              ; ID of first tile
+VicViper_U2_VRAM_End equ VicViper_U2_VRAM+VicViper_U2_SizeB
 
 VicViper_U2_SpriteDescriptor:
     dc.w $00F0        ; Y coord (+ 128)
