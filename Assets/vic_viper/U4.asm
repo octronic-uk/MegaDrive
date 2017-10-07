@@ -6,7 +6,6 @@
 ;      ash@octronic.co.uk
 
 VicViper_U4_Tiles_Start:
-	; --- Tiles ---
 	dc.l	$00000885	;	Tile (col 0, row 0)
 	dc.l	$000858bb
 	dc.l	$00001445
@@ -15,6 +14,16 @@ VicViper_U4_Tiles_Start:
 	dc.l	$00001288
 	dc.l	$16552528
 	dc.l	$24425462
+
+    dc.l	$28222462	;	Tile (col 0, row 1)
+	dc.l	$25424462
+	dc.l	$00054528
+	dc.l	$00004288
+	dc.l	$00016222
+	dc.l	$00054255
+	dc.l	$00000455
+	dc.l	$00000444
+
 	dc.l	$00000000	;	Tile (col 1, row 0)
 	dc.l	$58c00000
 	dc.l	$44000000
@@ -23,23 +32,9 @@ VicViper_U4_Tiles_Start:
 	dc.l	$5555558b
 	dc.l	$88885555
 	dc.l	$22225225
-	dc.l	$00000000	;	Tile (col 2, row 0)
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$85400000
-	dc.l	$588bbb80
-	dc.l	$58400000
-	dc.l	$28222462	;	Tile (col 0, row 1)
-	dc.l	$25424462
-	dc.l	$00054528
-	dc.l	$00004288
-	dc.l	$00016222
-	dc.l	$00054255
-	dc.l	$00000455
-	dc.l	$00000444
-	dc.l	$55552662	;	Tile (col 1, row 1)
+	
+
+    dc.l	$55552662	;	Tile (col 1, row 1)
 	dc.l	$22225225
 	dc.l	$88885555
 	dc.l	$55555440
@@ -47,6 +42,16 @@ VicViper_U4_Tiles_Start:
 	dc.l	$55400000
 	dc.l	$40000000
 	dc.l	$00000000
+
+    dc.l	$00000000	;	Tile (col 2, row 0)
+	dc.l	$00000000
+	dc.l	$00000000
+	dc.l	$00000000
+	dc.l	$00000000
+	dc.l	$85400000
+	dc.l	$588bbb80
+	dc.l	$58400000
+
 	dc.l	$58400000	;	Tile (col 2, row 1)
 	dc.l	$558bb850
 	dc.l	$54400000
@@ -56,6 +61,8 @@ VicViper_U4_Tiles_Start:
 	dc.l	$00000000
 	dc.l	$00000000
 VicViper_U4_Tiles_End:
+
+    nop     0,8
 
 VicViper_U4_VRAM        equ VicViper_U3_VRAM_End
 VicViper_U4_SizeB       equ (VicViper_U4_Tiles_End-VicViper_U4_Tiles_Start) ; Sprite size in bytes

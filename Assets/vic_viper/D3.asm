@@ -15,6 +15,16 @@ VicViper_D3_Tiles_Start:
 	dc.l	$169ceb81
 	dc.l	$0169ceec
 	dc.l	$25158bbb
+	
+    dc.l	$2b48bbc6	;	Tile (col 0, row 1)
+	dc.l	$2528ce91
+	dc.l	$00014886
+	dc.l	$00069bbe
+	dc.l	$00016cce
+	dc.l	$000b5ceb
+	dc.l	$00000ee4
+	dc.l	$00000000
+
 	dc.l	$00000000	;	Tile (col 1, row 0)
 	dc.l	$00000000
 	dc.l	$44500000
@@ -23,22 +33,7 @@ VicViper_D3_Tiles_Start:
 	dc.l	$6bb73588
 	dc.l	$cb7df37c
 	dc.l	$bb8737be
-	dc.l	$00000000	;	Tile (col 2, row 0)
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$00000000
-	dc.l	$54000000
-	dc.l	$cccccb80
-	dc.l	$c8400000
-	dc.l	$2b48bbc6	;	Tile (col 0, row 1)
-	dc.l	$2528ce91
-	dc.l	$00014886
-	dc.l	$00069bbe
-	dc.l	$00016cce
-	dc.l	$000b5ceb
-	dc.l	$00000ee4
-	dc.l	$00000000
+
 	dc.l	$bebb88bc	;	Tile (col 1, row 1)
 	dc.l	$8bceeccb
 	dc.l	$11ccacb4
@@ -47,6 +42,16 @@ VicViper_D3_Tiles_Start:
 	dc.l	$48c00000
 	dc.l	$00000000
 	dc.l	$00000000
+
+    dc.l	$00000000	;	Tile (col 2, row 0)
+	dc.l	$00000000
+	dc.l	$00000000
+	dc.l	$00000000
+	dc.l	$00000000
+	dc.l	$54000000
+	dc.l	$cccccb80
+	dc.l	$c8400000
+
 	dc.l	$cccccb80	;	Tile (col 2, row 1)
 	dc.l	$b8400000
 	dc.l	$00000000
@@ -55,7 +60,10 @@ VicViper_D3_Tiles_Start:
 	dc.l	$00000000
 	dc.l	$00000000
 	dc.l	$00000000
+
 VicViper_D3_Tiles_End:
+
+    nop     0,8
 
 VicViper_D3_VRAM     equ VicViper_D2_VRAM_End
 VicViper_D3_SizeB    equ (VicViper_D3_Tiles_End-VicViper_D3_Tiles_Start)    ; Sprite size in bytes

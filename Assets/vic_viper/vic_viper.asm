@@ -6,7 +6,7 @@
 ;      ash@octronic.co.uk
 
 ; Order in VRAM
-;   C   = $0500
+;   C   = $0F40
 ;   D1
 ;   D2
 ;   D3

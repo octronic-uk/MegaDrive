@@ -63,3 +63,9 @@ VDP_SCROLL_TABLE_B               equ $E000
 VDP_WINDOW_TABLE                 equ $0000
 VDP_SPRITE_TABLE                 equ $F000
 VDP_H_SCROLL_TABLE               equ $FC00
+
+; Palette offsets
+VDP_PALETTE_0   equ $0000
+VDP_PALETTE_1   equ $0020
+VDP_PALETTE_2   equ $0040
+VDP_PALETTE_3   equ $0060

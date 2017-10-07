@@ -49,7 +49,7 @@ if [[ ${BUILD_RESULT} == 0 ]]; then
     echo
 
     echo Running BlastEm
-    ~/software/blastem/blastem  ${PROJECT}.${_MD_ROM_EXT}
+    ~/software/blastem/blastem -r E -m gen ${PROJECT}.${_MD_ROM_EXT}
 
     exit 0
 else

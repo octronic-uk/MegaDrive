@@ -1,4 +1,4 @@
-PCBPalette:
+PCB_Palette:
 	; --- Palette ---
 	dc.w	$0000	;	Color $0 is transparent (so the actual value doesn't matter)
 	dc.w	$0000	;	Color $1
@@ -16,7 +16,7 @@ PCBPalette:
 	dc.w	$0aaa	;	Color $d
 	dc.w	$00ee	;	Color $e
 	dc.w	$0eec	;	Color $f
-PCBTilesStart:
+PCB_TilesStart:
 	; --- Tiles ---
 	dc.l	$33333333	;	Tile (col 0, row 0)
 	dc.l	$33333333
@@ -530,43 +530,43 @@ PCBTilesStart:
 	dc.l	$33333339
 	dc.l	$33333339
 	dc.l	$33333339
-PCBTilesEnd:
+PCB_TilesEnd:
 
-PCBTilesSizeB	    equ (PCBTilesEnd-PCBTilesStart) ; Font size in bytes
-PCBTilesSizeW	    equ (PCBTilesSizeB/2)           ; Font size in words
-PCBTilesSizeL	    equ (PCBTilesSizeB/4)           ; Font size in longs
-PCBTilesSizeT	    equ (PCBTilesSizeB/32)          ; Font size in tiles
-PCBTilesVRAM	    equ $0740                       ; Dest address in VRAM
-PCBTilesTileID	    equ (PCBTilesVRAM/32)           ; ID of first tile
+PCB_TilesVRAM	    equ $0740                         ; Dest address in VRAM
+PCB_TilesSizeB	    equ (PCB_TilesEnd-PCB_TilesStart) ; Font size in bytes
+PCB_TilesSizeW	    equ (PCB_TilesSizeB/2)            ; Font size in words
+PCB_TilesSizeL	    equ (PCB_TilesSizeB/4)            ; Font size in longs
+PCB_TilesSizeT	    equ (PCB_TilesSizeB/32)           ; Font size in tiles
+PCB_TilesTileID	    equ (PCB_TilesVRAM/32)            ; ID of first tile
 
     nop     0,8
 
-PCBLoadTiles:
-    move.l  #PCBTilesVRAM,-(sp)     ; d0 - VRAM address
-    jsr     VDPWriteVramMode
-    addq.l  #4,sp
-    move.l  #PCBTilesSizeT,d1       ; d1 - Num chars in tiles
+PCB_LoadTiles:
+    move.l  #PCB_TilesVRAM,-(sp)     ; d0 - VRAM address
+    jsr     VDP_WriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
+    move.l  #PCB_TilesSizeT,d1       ; d1 - Num chars in tiles
     subq.b  #1,d1                   ; Num chars - 1
-    lea     PCBTilesStart,a0        ; a0 - Font address
-PCBLoadTilesCopy:
+    lea     PCB_TilesStart,a0        ; a0 - Font address
+PCB_LoadTilesCopy:
     move.w  #8,d2                   ; 8 longwords in tile
     subq.b  #1,d2                   ; - 1 for loop
-PCBLoadTilesLongCopy:
+PCB_LoadTilesLongCopy:
     move.l  (a0)+,VDP_DATA_PORT     ; Copy one line of tile to VDP data port
-    dbra    d2,PCBLoadTilesLongCopy
-    dbra    d1,PCBLoadTilesCopy
+    dbra    d2,PCB_LoadTilesLongCopy
+    dbra    d1,PCB_LoadTilesCopy
     rts
 
-PCBOnPlane:
+PCB_OnPlane:
     ; Setup VRAM Write
     movea.l  4(sp),a0
 _PCB_On_Plane_Set_Address:
     move.l  a0,-(sp)
-    jsr     VDPWriteVramMode
-    addq.l  #4,sp
+    jsr     VDP_WriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
 _PCB_On_Plane_Setup_Loop:
     ; d0: Tile ID
-    move.l  #PCBTilesTileID,d0
+    move.l  #PCB_TilesTileID,d0
     move.l  #8,d1 ; X Index
     subq.l  #1,d1
 _PCB_On_Plane_Loop_X:
@@ -586,47 +586,23 @@ _PCB_On_Plane_Loop_Y:
     add.l   #128,a0
     movem.l d0-d7/a0,-(sp)
     move.l  a0,-(sp)
-    jsr     VDPWriteVramMode
-    addq.l  #4,sp
+    jsr     VDP_WriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
     movem.l (sp)+,d0-d7/a0
     dbra d1,_PCB_On_Plane_Loop_X
 	rts
 
-PCBPushPalette:
-    ; Set autoincrement to 2 bytes
-    move.l  #2,-(sp)
-    jsr     VDPSetAutoIncrement
-	addq.l  #4,sp
-
-    ; Set up VDP to write to CRAM address $0000
-    move.l  #$0020,-(sp)
-    jsr     VDPWriteCramMode
-    addq.l  #4,sp
-
-    ; Load address of Palette into a0
-    lea     PCBPalette,a0               
-    ; 32 bytes of data (8 longwords, minus 1 for counter) in palette
-    move.l  #8,d0                  
-    subq.l  #1,d0                  
-
-_PushPCBPaletteLoop:
-    ; Move data to VDP data port, and increment source address
-    move.l  (a0)+,VDP_DATA_PORT        
-    dbra    d0,_PushPCBPaletteLoop
-
-    rts
-
-PCBDrawRow:
+PCB_DrawRow:
     move.l  4(sp),a0 ; Get start address into a0
     move.l  a0,a1    ; Setup End Address in a1
     add.l   #$80,a1  ; to be a0 + $60
-PCBDrawRowLoop:
+_PCB_DrawRow_Loop:
     movem.l  d0/a0-a1,-(sp) ; Cache Registers
     move.l  a0,-(sp)        ; Push Address Param
-    jsr     PCBOnPlane      ; Draw PCB
+    jsr     PCB_OnPlane     ; Draw PCB
     addq.l  #4,sp           ; Correct Stack
-    movem.l  (sp)+,d0/a0-a1 ; Restore Registers
+    movem.l (sp)+,d0/a0-a1  ; Restore Registers
     add.l   #$10,a0         ; Add 16 to draw address
     cmp.l   a0,a1           ; Compare with limit
-    bgt     PCBDrawRowLoop  ; Are we there yet?
+    bgt     _PCB_DrawRow_Loop ; Are we there yet?
     rts

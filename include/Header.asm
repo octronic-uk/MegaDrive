@@ -122,8 +122,8 @@ _Header_Clear_RAM_Loop:
 	dbra    d0,_Header_Clear_RAM_Loop	; Continue clearing RAM if there's anything left.
 
     move.l  #2,-(sp) 
-    jsr     VDPSetAutoIncrement
-    addq.l  #4,sp
+    jsr     VDP_SetAutoIncrement
+    addq.l  #VDP_SET_AUTO_INCREMENT_ALIGN,sp
 
     jsr     _Header_Clear_VRAM       
     jsr     _Header_Clear_CRAM
@@ -159,8 +159,7 @@ _Header_Clear_VRAM_Loop:
     rts
 
 _Header_PortC_Ok:
-	bsr.w   _Header_Z80Init		; Initialize the Z80.
-	move    #$2300,sr		; Enable interrupts.
+	jmp   _Header_Z80Init	; Initialize the Z80.
 	jmp     Main    		; Branch to main program.
 	nop
 
@@ -211,13 +210,9 @@ _Header_InitCleanup:
     move.l  #$0,a0              ; Move $0 to a0
     movem.l (a0),d0-d7/a1-a6    ; Multiple move 0 to all registers
 
-_Header_LoadFont:
-    jsr     _TextLoadFont
-
-_Header_EnableInterrupts:
-	move    #$2300,sr		; Enable interrupts.
-
 Main:
+    jsr     _TextLoadFont
+	move    #$2300,sr		; Enable interrupts.
     jmp __GameMain
 
 ; Interrupt Handlers -----------------------------------------------------------
@@ -296,8 +291,9 @@ E_Trap:
 
 ExceptionMsg:
     move.l  #2,-(sp)
-    jsr     VDPSetAutoIncrement
-    addq.l  #4,sp
+    jsr     VDP_SetAutoIncrement
+    addq.l  #VDP_SET_AUTO_INCREMENT_ALIGN,sp
+
     move.l  #_PixelFontTileID,-(sp) ; First font tile
     move.l  #$0001,-(sp)            ; X,Y
     move.l  #$0,-(sp)               ; Palette Index

@@ -665,13 +665,13 @@ _TextLoadFont:
 
     ; Set autoincrement to 2 bytes
     move.l  #2,-(sp)
-    jsr     VDPSetAutoIncrement
-	addq.l  #4,sp
+    jsr     VDP_SetAutoIncrement
+	addq.l  #VDP_SET_AUTO_INCREMENT_ALIGN,sp
 
     ; Set up VDP to write to CRAM address $0000
     move.l  #$0000,-(sp)
-    jsr     VDPWriteCramMode
-    addq.l  #4,sp
+    jsr     VDP_WriteCramMode
+    addq.l  #VDP_WRITE_CRAM_MODE_ALIGN,sp
 
     ; Load address of Palette into a0
     lea     _TextPalette,a0               
@@ -686,8 +686,8 @@ _PushPaletteLoop:
 
 
     move.l  #_PixelFontVRAM,-(sp) ; d0 - VRAM address
-    jsr     VDPWriteVramMode
-    addq.l  #4,sp
+    jsr     VDP_WriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
 
     move.l  #_PixelFontSizeT,d1   ; d1 - Num chars in tiles
     subq.b  #1,d1                 ; Num chars - 1
@@ -731,8 +731,8 @@ _TextOnPlaneA:
     add.l   #VDP_SCROLL_TABLE_A,d3 
     movem.l d0-d3/a0,-(sp)
     move.l  d3,-(sp)
-    jsr     VDPWriteVramMode
-    addq.l  #4,sp
+    jsr     VDP_WriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
     movem.l (sp)+,d0-d3/a0
 
 	clr.l    d3                ; Clear d3 ready to work with again
@@ -775,8 +775,8 @@ _TextOnPlaneB:
     add.l   #VDP_SCROLL_TABLE_B,d3 
     movem.l d0-d3/a0,-(sp)
     move.l  d3,-(sp)
-    jsr     VDPWriteVramMode
-    addq.l  #4,sp
+    jsr     VDP_WriteVramMode
+    addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
     movem.l (sp)+,d0-d3/a0
 	clr.l    d3                ; Clear d3 ready to work with again
 	move.b   d2,d3             ; Move palette ID (lower byte of d2) to d3
