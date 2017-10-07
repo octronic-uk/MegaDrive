@@ -5,14 +5,13 @@
 ;   \/_/\/_/ \/_____/ \/_/\/_/ 
 ;      ash@octronic.co.uk      
 ;
-;   PCB.asm 
-;      - More fun with the VDP
+;   Scroller.asm 
+;       - Scrolling Shmup type demo with ripped assets.
+;           - PCB - MacOS 7.5
+;           - VicViper (Parodius DA)
   
 ; Includes
     include "../include/Header.asm"
-    include "../include/VDP.asm"
-    include "../include/Controller.asm"
-    include "../include/Text.asm"
     include "../Assets/pcb/pcb.asm"
     include "../Assets/vic_viper/vic_viper.asm"
 
