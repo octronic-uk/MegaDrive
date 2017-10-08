@@ -238,7 +238,7 @@ VDP_SetSprite_TileID:
 
 ; Usage
 ;       move.l  #SPRITE_DEF_ADDRESS,-(sp)
-;       jsr     VDP_SetSpriteX
+;       jsr     VDP_GetSpriteX
 ;       addq.l  #VDP_SET_SPRITE_X_ALIGN,sp
 ;   Uses
 ;       d0,d1
@@ -352,7 +352,7 @@ _VDP_LoadPalette_Loop:
 ;       pea     Tiles Source
 ;       move.l  Number Of Tiles
 ;       move.l  Tiles VRam Destination
-;       jsr     LoadSprite
+;       jsr     VDP_LoadTiles
 ;       add.l   #LOAD_SPRITE_STACK_ALIGN,sp
 
 VDP_LOAD_TILES_ALIGN  equ 12
@@ -386,11 +386,15 @@ _VDP_LoadTiles_Loop:
 ;       jsr     VDP_LoadSprite
 ;       add.l   #VDP_LOAD_SPRITE_ALIGN,sp
 
-VDP_LOAD_SPRITE_ALIGN equ 4
-VDP_LOAD_SPRITE_DESCRIPTOR equ 4
+VDP_LOAD_SPRITE_ALIGN      equ 6
+VDP_LOAD_SPRITE_DESCRIPTOR equ 6
+VDP_LOAD_SPRITE_INDEX      equ 4
 
 VDP_LoadSprite:
-    move.l  #VDP_SPRITE_TABLE,-(sp)
+    move.w   VDP_LOAD_SPRITE_INDEX(sp),d0
+    mulu.w  #8,d0
+    add.l   #VDP_SPRITE_TABLE,d0
+    move.l  d0,-(sp)
     jsr     VDP_WriteVramMode
     addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
     move.l  VDP_LOAD_SPRITE_DESCRIPTOR(sp),a0

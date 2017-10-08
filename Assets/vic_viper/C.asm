@@ -69,7 +69,7 @@ VicViper_C_VRAM_End equ VicViper_C_VRAM+VicViper_C_SizeB
 VicViper_C_SpriteDescriptor:
     dc.w $00F0        ; Y coord (+ 128)
     dc.b %00001001    ; Width (bits 0-1) and height (bits 2-3)
-    dc.b $00          ; Index of next sprite (linked list)
+    dc.b $01          ; Index of next sprite (linked list)
     dc.b $40          ; H/V flipping (bits 3/4), palette index (bits 5-6), priority (bit 7)
     dc.b VicViper_C_TileID   ; Index of first tile
     dc.w $00F0        ; X Coordinate (+128)
