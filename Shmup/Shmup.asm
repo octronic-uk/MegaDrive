@@ -43,9 +43,18 @@ _Shmup_Update_Projectiles:
     beq     _Shmup_Update_Projectiles_ShouldUpdate  
     rts
 _Shmup_Update_Projectiles_ShouldUpdate:
+    ; Reset update delay
     move.w  #PROJECTILE_SPEED_DELAY,_Shmup_Projectile_Speed_Delay_W
+    ; Init Loop Counter
+    move.w  #PROJECTILES_MAX,d7
+    subq.w  #1,d7
+_Shmup_Update_Projectiles_ShouldUpdate_Next:
+    ; Stash Loop Counter
+    move.w  d7,-(sp)
     ; Get the struct address
     movea.l #_Shmup_Projectile_Array,a0 
+    mulu.w  #PROJECTILE_STRUCT_SIZE,d7
+    add.w   d7,a0
     ; Check if active
     cmpi.w  #TRUE,PROJECTILE_STRUCT_ACTIVE_W(a0)
     bne     _Shmup_Update_Projectiles_Skip
@@ -78,7 +87,6 @@ _Shmup_Update_Projectiles_XPos:
     move.w  PROJECTILE_STRUCT_Y_W(a0),d2
     add.w   PROJECTILE_STRUCT_Y_VEL_W(a0),d2
     move.w  d2,PROJECTILE_STRUCT_Y_W(a0)
-
     ; Test if off screen
     cmpi.w  #VDP_SPRITE_Y_MAX_40,PROJECTILE_STRUCT_Y_W(a0)
     blt     _Shmup_Update_Projectiles_YPos
@@ -93,6 +101,9 @@ _Shmup_Update_Projectiles_YPos:
     jsr     VDP_SetSpriteY
     addq.l  #VDP_SET_SPRITE_Y_ALIGN,sp
 _Shmup_Update_Projectiles_Skip:
+    ; Restore Loop Counter
+    move.w  (sp)+,d7
+    dbra    d7,_Shmup_Update_Projectiles_ShouldUpdate_Next
     rts
 
 _Shmup_InitCounters:
@@ -190,20 +201,34 @@ _Shmup_SetTiltSprite_End:
     move.w  d0,-(sp)
     jsr     VDP_SetSprite_TileID
     addq.l  #VDP_SET_SPRITE_TILE_ID_ALIGN,sp
-
     rts
 
 _Shmup_HandleController_Buttons:
     btst    #CTRL_A,_Shmup_Ctrl_Last_W
     bne     _Shmup_HandleController_Buttons_End
+    ; Setup Counter
+    move.w  #PROJECTILES_MAX,d7
+    subq.w  #1,d7
+_Shmup_HandleController_Buttons_Next:
     ; Activate Projectile
+    move.w  d7,d6
+    mulu.w  #PROJECTILE_STRUCT_SIZE,d6
     movea.l #_Shmup_Projectile_Array,a0
+    add.w   d6,a0
+    ; Check if active
+    cmp.w   #TRUE,PROJECTILE_STRUCT_ACTIVE_W(a0)
+    beq     _Shmup_HandleController_Buttons_IsActive
+    ; Not active
     move.w  #TRUE,PROJECTILE_STRUCT_ACTIVE_W(a0)
     ; Update Position
+    ; TODO - Use offset from ship for xy
     move.w  #$00F0,PROJECTILE_STRUCT_X_W(a0)
     move.w  #$00F0,PROJECTILE_STRUCT_Y_W(a0)
-    move.w  #$0001,PROJECTILE_STRUCT_X_VEL_W(a0)
-    move.w  #$0000,PROJECTILE_STRUCT_Y_VEL_W(a0)
+    move.w  #PROJECTILE_DEFAULT_VEL_X,PROJECTILE_STRUCT_X_VEL_W(a0)
+    move.w  #PROJECTILE_DEFAULT_VEL_Y,PROJECTILE_STRUCT_Y_VEL_W(a0)
+
+_Shmup_HandleController_Buttons_IsActive:
+    dbra d7,_Shmup_HandleController_Buttons_Next
 
 _Shmup_HandleController_Buttons_End:
     rts
@@ -214,9 +239,7 @@ _Shmup_HandleController_Dpad:
     beq     _Shmup_HandleController_Dpad_ShouldUpdate
     rts
 _Shmup_HandleController_Dpad_ShouldUpdate:
-
     jsr     _Shmup_TiltDecay
-
     move.w  #PLAYER_SPEED_DELAY,_Shmup_Player_Speed_Delay_W
     cmp.w   #VDP_SPRITE_Y_MIN,_Shmup_PlayerYPos_W
     ble     _Shmup_TestController_IsMinY
@@ -336,19 +359,35 @@ _Shmup_Setup_Projectiles:
     move.l  #Projectile_VRAM,-(sp)
     jsr     VDP_LoadTiles
     add.l   #VDP_LOAD_TILES_ALIGN,sp
+    ; Setup for loop
+    move.w  #PROJECTILES_MAX,d7
+    subq.w  #1,d7
+_Shmup_Setup_Projectiles_Next:
+    ; Stash Loop Index
+    move.w  d7,-(sp)
+    move.w  d7,d6   ; Hold working value in d6 for addr
+    move.w  d7,d5   ; Hold working value in d5 for ID
+    addq.w  #1,d5   ; Go from PROJECTILES_MAX to 1 rather than 0.
     ; Load Sprite Desc
+    ; TODO - Gotta link to next sprite
     pea     Projectile_SpriteDescriptor
-    move.w  #1,-(sp)
+    move.w  d5,-(sp)
     jsr     VDP_LoadSprite
     addq.l  #VDP_LOAD_SPRITE_ALIGN,sp
-    ; Set Projectile Struct RAM
+    ; Setup sprite struct ram address
     movea.l #_Shmup_Projectile_Array,a0 
-    move.w  #1,PROJECTILE_STRUCT_SPRITE_ID_W(a0)
+    mulu.w  #PROJECTILE_STRUCT_SIZE,d6
+    add.w   d6,a0
+    ; Set Projectile Struct RAM
+    move.w  d5,PROJECTILE_STRUCT_SPRITE_ID_W(a0)
     move.w  #0,PROJECTILE_STRUCT_X_W(a0)
     move.w  #0,PROJECTILE_STRUCT_Y_W(a0)
     move.w  #0,PROJECTILE_STRUCT_X_VEL_W(a0)
     move.w  #0,PROJECTILE_STRUCT_Y_VEL_W(a0)
     move.w  #FALSE,PROJECTILE_STRUCT_ACTIVE_W(a0)
+    ; Restore Loop Index
+    move.w  (sp)+,d7
+    dbra    d7,_Shmup_Setup_Projectiles_Next
     rts
 
 _Shmup_Setup_VicViper:
@@ -431,7 +470,8 @@ _Shmup_Projectile_Array         equ RAM_START+$10
 
 HSCROLL_DELAY           equ  $000F
 PLAYER_SPEED_DELAY      equ  $000A
-PROJECTILE_SPEED_DELAY  equ  $0001
+PROJECTILE_SPEED_DELAY  equ  $0003
+PROJECTILES_MAX         equ  8
 PLAYER_WIDTH            equ  24
 PLAYER_HEIGHT           equ  16
 
@@ -449,7 +489,7 @@ TILT_U3                 equ  8*TILT_WAIT
 TILT_U4                 equ  9*TILT_WAIT
 TILT_MAX                equ TILT_U4
 
-TRUE    equ $FFFF
-FALSE   equ $0000
+TRUE    equ $1111
+FALSE   equ $FFFF
 
 __end    ; Very last line, end of ROM address
