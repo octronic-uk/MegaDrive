@@ -9,7 +9,7 @@ Projectile_Tiles_Start:
 	dc.l	$00000000
 Projectile_Tiles_End:
 
-    nop     0,8
+    even
 
 Projectile_VRAM        equ VicViper_U4_VRAM_End
 Projectile_SizeB       equ (Projectile_Tiles_End-Projectile_Tiles_Start)    ; Sprite size in bytes
@@ -27,6 +27,8 @@ Projectile_SpriteDescriptor:
     dc.b Projectile_TileID  ; Index of first tile
     dc.w $0000              ; X Coordinate (+128)
 
+    even
+
 PROJECTILE_STRUCT_SPRITE_ID_W equ $00 
 PROJECTILE_STRUCT_X_W         equ $02
 PROJECTILE_STRUCT_Y_W         equ $04
@@ -35,8 +37,4 @@ PROJECTILE_STRUCT_Y_VEL_W     equ $08
 PROJECTILE_STRUCT_ACTIVE_W    equ $0A
 
 PROJECTILE_STRUCT_SIZE        equ $0C
-
-PROJECTILE_DEFAULT_VEL_X      equ 1
-PROJECTILE_DEFAULT_VEL_Y      equ 0
-
 

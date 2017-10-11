@@ -23,3 +23,4 @@ VicViper_Palette:
 	dc.w	$08ce	;	Color $d
 	dc.w	$0cce	;	Color $e
 
+    even    

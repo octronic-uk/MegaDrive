@@ -15,8 +15,10 @@
     include "../Assets/pcb/pcb.asm"
     include "../Assets/vic_viper/vic_viper.asm"
     include "../Assets/projectile/projectile.asm"
+    include "../Intro/Intro.asm"
 
 __GameMain:
+    jsr     _Intro
     jsr     _Shmup_SetupBG
     jsr     _Shmup_Setup_VicViper
     jsr     _Shmup_Setup_Projectiles
@@ -29,22 +31,16 @@ _Shmup_Loop:
     jsr     _Shmup_HandleController_Buttons
     jsr     _Shmup_SetTiltSprite
     ; Wait for VBlank
-    jsr     VDP_WaitVBlankEnd
+    jsr     VDP_WaitVBlankStart
     jsr     _Shmup_Update_BG
     jsr     _Shmup_Update_Player
     jsr     _Shmup_Update_Projectiles
+    jsr     VDP_WaitVBlankEnd
     jmp     _Shmup_Loop
 
 ; Subroutines ------------------------------------------------------------------
 
 _Shmup_Update_Projectiles:
-    subq.w  #1,_Shmup_Projectile_Speed_Delay_W
-    cmpi.w  #0,_Shmup_Projectile_Speed_Delay_W
-    beq     _Shmup_Update_Projectiles_ShouldUpdate  
-    rts
-_Shmup_Update_Projectiles_ShouldUpdate:
-    ; Reset update delay
-    move.w  #PROJECTILE_SPEED_DELAY,_Shmup_Projectile_Speed_Delay_W
     ; Init Loop Counter
     move.w  #PROJECTILES_MAX,d7
     subq.w  #1,d7
@@ -108,12 +104,10 @@ _Shmup_Update_Projectiles_Skip:
 
 _Shmup_InitCounters:
     move.w  #$0000,_Shmup_HScroll_W
-    move.w  #$00F0,_Shmup_PlayerXPos_W
-    move.w  #$00F0,_Shmup_PlayerYPos_W
+    move.w  #VDP_SPRITE_X_MIN+8,_Shmup_PlayerXPos_W
+    move.w  #(VDP_SPRITE_HEIGHT/2)+VDP_SPRITE_Y_MIN-8,_Shmup_PlayerYPos_W
     move.w  #TILT_C,_Shmup_Tilt_W
-    move.w  #HSCROLL_DELAY,_Shmup_HScroll_Delay_W
-    move.w  #PLAYER_SPEED_DELAY,_Shmup_Player_Speed_Delay_W
-    move.w  #PROJECTILE_SPEED_DELAY,_Shmup_Projectile_Speed_Delay_W
+    move.w  #PROJECTILE_INTERVAL,_Shmup_Projectile_Interval_W
     rts
 
 _Shmup_TiltDecay:
@@ -204,6 +198,11 @@ _Shmup_SetTiltSprite_End:
     rts
 
 _Shmup_HandleController_Buttons:
+    cmpi.w   #0,_Shmup_Projectile_Interval_W
+    beq     _Shmup_HandleController_Buttons_ProjectileIntervalPassed
+    subq.w   #1,_Shmup_Projectile_Interval_W
+    rts 
+_Shmup_HandleController_Buttons_ProjectileIntervalPassed:
     btst    #CTRL_A,_Shmup_Ctrl_Last_W
     bne     _Shmup_HandleController_Buttons_End
     ; Setup Counter
@@ -221,26 +220,22 @@ _Shmup_HandleController_Buttons_Next:
     ; Not active
     move.w  #TRUE,PROJECTILE_STRUCT_ACTIVE_W(a0)
     ; Update Position
-    ; TODO - Use offset from ship for xy
-    move.w  #$00F0,PROJECTILE_STRUCT_X_W(a0)
-    move.w  #$00F0,PROJECTILE_STRUCT_Y_W(a0)
+    move.w  _Shmup_PlayerXPos_W,PROJECTILE_STRUCT_X_W(a0)
+    add.w   #PLAYER_WIDTH,PROJECTILE_STRUCT_X_W(a0)
+    move.w  _Shmup_PlayerYPos_W,PROJECTILE_STRUCT_Y_W(a0)
+    add.w   #(PLAYER_HEIGHT/2)-4,PROJECTILE_STRUCT_Y_W(a0)
     move.w  #PROJECTILE_DEFAULT_VEL_X,PROJECTILE_STRUCT_X_VEL_W(a0)
     move.w  #PROJECTILE_DEFAULT_VEL_Y,PROJECTILE_STRUCT_Y_VEL_W(a0)
-
+    ; Put projectile interval
+    move.w  #PROJECTILE_INTERVAL,_Shmup_Projectile_Interval_W
+    jmp _Shmup_HandleController_Buttons_End
 _Shmup_HandleController_Buttons_IsActive:
     dbra d7,_Shmup_HandleController_Buttons_Next
-
 _Shmup_HandleController_Buttons_End:
     rts
 
 _Shmup_HandleController_Dpad:
-    subq.w  #1,_Shmup_Player_Speed_Delay_W
-    cmpi.w  #0,_Shmup_Player_Speed_Delay_W
-    beq     _Shmup_HandleController_Dpad_ShouldUpdate
-    rts
-_Shmup_HandleController_Dpad_ShouldUpdate:
     jsr     _Shmup_TiltDecay
-    move.w  #PLAYER_SPEED_DELAY,_Shmup_Player_Speed_Delay_W
     cmp.w   #VDP_SPRITE_Y_MIN,_Shmup_PlayerYPos_W
     ble     _Shmup_TestController_IsMinY
     jsr     _Shmup_TestController_Up
@@ -263,7 +258,7 @@ _Shmup_TestController_IsXMax:
 _Shmup_TestController_Up
     btst    #CTRL_UP,_Shmup_Ctrl_Last_W
     bne     _Shmup_TestController_Up_End 
-    subq.w  #1,_Shmup_PlayerYPos_W
+    subq.w  #PLAYER_VEL,_Shmup_PlayerYPos_W
     addq.w  #1,_Shmup_Tilt_W
 _Shmup_TestController_Up_End:
     rts
@@ -271,7 +266,7 @@ _Shmup_TestController_Up_End:
 _Shmup_TestController_Down:
     btst    #CTRL_DOWN,_Shmup_Ctrl_Last_W
     bne     _Shmup_TestController_Down_End
-    addq.w  #1,_Shmup_PlayerYPos_W
+    addq.w  #PLAYER_VEL,_Shmup_PlayerYPos_W
     subq.w  #1,_Shmup_Tilt_W
 _Shmup_TestController_Down_End:
     rts
@@ -279,14 +274,14 @@ _Shmup_TestController_Down_End:
 _Shmup_TestController_Left:
     btst    #CTRL_LEFT,_Shmup_Ctrl_Last_W
     bne     _Shmup_TestController_Left_End
-    subq.w  #1,_Shmup_PlayerXPos_W
+    subq.w  #PLAYER_VEL,_Shmup_PlayerXPos_W
 _Shmup_TestController_Left_End:
     rts
 
 _Shmup_TestController_Right:
     btst    #CTRL_RIGHT,_Shmup_Ctrl_Last_W
     bne     _Shmup_TestController_Right_End
-    addq.w  #1,_Shmup_PlayerXPos_W
+    addq.w  #PLAYER_VEL,_Shmup_PlayerXPos_W
 _Shmup_TestController_Right_End:
     rts
 
@@ -296,9 +291,6 @@ _Shmup_Update_BG:
     jsr     VDP_SetAutoIncrement
     addq.l  #VDP_SET_AUTO_INCREMENT_ALIGN,sp
     ; Move BG
-    subq.w  #1,_Shmup_HScroll_Delay_W
-    cmpi.w  #0,_Shmup_HScroll_Delay_W
-    bne     _Shmup_Update_HScroll_Skip
     ; Update BG
     move.l  #VDP_H_SCROLL_TABLE,-(sp)
     jsr     VDP_WriteVramMode
@@ -306,19 +298,16 @@ _Shmup_Update_BG:
     ; Decrement Scroll
     subq.w  #1,_Shmup_HScroll_W
     move.w  _Shmup_HScroll_W,VDP_DATA_PORT
-    ; Reset Delay
-    move.w  #HSCROLL_DELAY,_Shmup_HScroll_Delay_W
-_Shmup_Update_HScroll_Skip:
     rts
 
 _Shmup_Update_Player:
     ; Update Player Position
-    ; Ecks
+    ; X
     move.l  #VDP_SPRITE_TABLE,-(sp)
     move.w  _Shmup_PlayerXPos_W,-(sp)
     jsr     VDP_SetSpriteX
     addq.l  #VDP_SET_SPRITE_X_ALIGN,sp
-    ; Why
+    ; Y 
     move.l  #VDP_SPRITE_TABLE,-(sp)
     move.w  _Shmup_PlayerYPos_W,-(sp)
     jsr     VDP_SetSpriteY
@@ -368,10 +357,16 @@ _Shmup_Setup_Projectiles_Next:
     move.w  d7,d6   ; Hold working value in d6 for addr
     move.w  d7,d5   ; Hold working value in d5 for ID
     addq.w  #1,d5   ; Go from PROJECTILES_MAX to 1 rather than 0.
+    move.w  d5,d4
+    addq.w  #1,d4   ; next linked sprite index
+    cmp.w   #PROJECTILES_MAX+1,d4
+    bne     _Shmup_Setup_Projectiles_Next_Load
+    move.w  #0,d4 ; Set link of last sprite to 0
+_Shmup_Setup_Projectiles_Next_Load:
     ; Load Sprite Desc
-    ; TODO - Gotta link to next sprite
     pea     Projectile_SpriteDescriptor
     move.w  d5,-(sp)
+    move.w  d4,-(sp)
     jsr     VDP_LoadSprite
     addq.l  #VDP_LOAD_SPRITE_ALIGN,sp
     ; Setup sprite struct ram address
@@ -453,29 +448,27 @@ _Shmup_Setup_VicViper:
     ; Load Sprite Desc
     pea     VicViper_C_SpriteDescriptor
     move.w  #0,-(sp)
+    move.w  #1,-(sp)
     jsr     VDP_LoadSprite
     addq.l  #VDP_LOAD_SPRITE_ALIGN,sp
     ; Return
     rts
 
 _Shmup_HScroll_W                equ RAM_START
-_Shmup_PlayerXPos_W             equ RAM_START+$02
-_Shmup_PlayerYPos_W             equ RAM_START+$04
-_Shmup_Tilt_W                   equ RAM_START+$06
-_Shmup_Ctrl_Last_W              equ RAM_START+$08
-_Shmup_HScroll_Delay_W          equ RAM_START+$0A
-_Shmup_Player_Speed_Delay_W     equ RAM_START+$0C
-_Shmup_Projectile_Speed_Delay_W equ RAM_START+$0E
-_Shmup_Projectile_Array         equ RAM_START+$10
+_Shmup_PlayerXPos_W             equ RAM_START+$2
+_Shmup_PlayerYPos_W             equ RAM_START+$4
+_Shmup_Tilt_W                   equ RAM_START+$6
+_Shmup_Ctrl_Last_W              equ RAM_START+$8
+_Shmup_Projectile_Interval_W    equ RAM_START+$A
+_Shmup_Projectile_Array         equ RAM_START+$C
 
-HSCROLL_DELAY           equ  $000F
-PLAYER_SPEED_DELAY      equ  $000A
-PROJECTILE_SPEED_DELAY  equ  $0003
-PROJECTILES_MAX         equ  8
+PROJECTILE_INTERVAL     equ  1
+PROJECTILES_MAX         equ  16
 PLAYER_WIDTH            equ  24
 PLAYER_HEIGHT           equ  16
+PLAYER_VEL              equ  2 
 
-TILT_WAIT               equ  8
+TILT_WAIT               equ  3
 TILT_MIN                equ  1
 
 TILT_D4                 equ  1*TILT_WAIT
@@ -487,9 +480,12 @@ TILT_U1                 equ  6*TILT_WAIT
 TILT_U2                 equ  7*TILT_WAIT
 TILT_U3                 equ  8*TILT_WAIT
 TILT_U4                 equ  9*TILT_WAIT
-TILT_MAX                equ TILT_U4
+TILT_MAX                equ     TILT_U4
 
-TRUE    equ $1111
-FALSE   equ $FFFF
+TRUE                    equ $1111
+FALSE                   equ $FFFF
+
+PROJECTILE_DEFAULT_VEL_X      equ 16
+PROJECTILE_DEFAULT_VEL_Y      equ 0
 
 __end    ; Very last line, end of ROM address

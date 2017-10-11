@@ -199,7 +199,7 @@ CharOffsetMap:
 	dc.b $19	; Y
 	dc.b $1A	; Z (ASCII code $5A)
 
-    nop     0,8
+    even
 
 _PixelFontStart: ; Font start address
 	; Space

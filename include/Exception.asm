@@ -126,3 +126,5 @@ E_IRQ_STR:
     dc.b    "IRQ Exception",0,0
 E_TRAP_EXCEPTION_STR:
     dc.b    "TRAP_EXCEPTION",0,0
+
+    even

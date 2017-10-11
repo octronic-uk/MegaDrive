@@ -17,7 +17,7 @@
 ;   Returns
 ;       d0: VDP Status
 VDP_ReadStatus_D0:
-    andi.l  #00000000,d0
+    andi.l  #$00000000,d0
     move.w  VDP_CTRL_PORT,d0
     rts
     
@@ -299,8 +299,7 @@ VDP_SetSpriteY:
 ;   Usage
 ;       jsr     VDP_WaitVBlankStart
 ;   Uses
-;
-
+;       d0
 VDP_WaitVBlankStart:
    move.w   VDP_CTRL_PORT,d0    ; Move VDP status word to d0
    andi.w   #$0008,d0           ; AND with bit 4 (vblank), result in status register
@@ -314,7 +313,7 @@ VDP_WaitVBlankStart:
 VDP_WaitVBlankEnd:
    move.w   VDP_CTRL_PORT,d0    ; Move VDP status word to d0
    andi.w   #$0008,d0           ; AND with bit 4 (vblank), result in status register
-   beq      VDP_WaitVBlankEnd    ; Branch if equal (to zero)
+   beq      VDP_WaitVBlankEnd   ; Branch if equal (to zero)
    rts
 
 ;   Usage
@@ -383,21 +382,38 @@ _VDP_LoadTiles_Loop:
 
 ;   Usage
 ;       pea     Sprite Descriptor Address
+;       move.w  #SPRITE_TABLE_INDEX
+;       move.w  #SPRITE_TABLE_LINK_INDEX
 ;       jsr     VDP_LoadSprite
 ;       add.l   #VDP_LOAD_SPRITE_ALIGN,sp
 
-VDP_LOAD_SPRITE_ALIGN      equ 6
-VDP_LOAD_SPRITE_DESCRIPTOR equ 6
-VDP_LOAD_SPRITE_INDEX      equ 4
+VDP_LOAD_SPRITE_ALIGN      equ 8
+VDP_LOAD_SPRITE_DESCRIPTOR equ 8 
+VDP_LOAD_SPRITE_INDEX      equ 6
+VDP_LOAD_SPRITE_LINK_INDEX equ 4
 
 VDP_LoadSprite:
+    ; Determine VDP Address
     move.w   VDP_LOAD_SPRITE_INDEX(sp),d0
     mulu.w  #8,d0
     add.l   #VDP_SPRITE_TABLE,d0
+    ; Write vram mode
     move.l  d0,-(sp)
     jsr     VDP_WriteVramMode
     addq.l  #VDP_WRITE_VRAM_MODE_ALIGN,sp
+    ; Get data into registers
     move.l  VDP_LOAD_SPRITE_DESCRIPTOR(sp),a0
-    move.l  (a0)+,VDP_DATA_PORT
-    move.l  (a0)+,VDP_DATA_PORT
+    move.l  (a0)+,d0
+    move.l  (a0)+,d1
+    ; Put in link index
+    move.w  VDP_LOAD_SPRITE_LINK_INDEX(sp),d2
+    ; mask off link index bits
+    andi.w  #$00FF,d2
+    ; mask OUT link index from descriptorn and combine with d0
+    andi.l  #$FFFFFF00,d0
+    or.w    d2,d0
+    ; Wrie to vdp
+    move.l  d0,VDP_DATA_PORT
+    move.l  d1,VDP_DATA_PORT
+    ; OK, bye
     rts

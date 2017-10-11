@@ -62,7 +62,7 @@ VicViper_D1_Tiles_Start:
 	dc.l	$54000000
 VicViper_D1_Tiles_End:
 
-    nop     0,8
+    even
 
 VicViper_D1_VRAM     equ VicViper_C_VRAM_End
 VicViper_D1_SizeB    equ (VicViper_D1_Tiles_End-VicViper_D1_Tiles_Start) ; Sprite size in bytes

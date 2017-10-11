@@ -62,7 +62,7 @@ VicViper_U4_Tiles_Start:
 	dc.l	$00000000
 VicViper_U4_Tiles_End:
 
-    nop     0,8
+    even
 
 VicViper_U4_VRAM        equ VicViper_U3_VRAM_End
 VicViper_U4_SizeB       equ (VicViper_U4_Tiles_End-VicViper_U4_Tiles_Start) ; Sprite size in bytes

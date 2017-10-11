@@ -197,7 +197,7 @@ _Header_VDPInitCopy:
     add.w   #$0100,d1           ; Increment register #
     dbra    d0,_Header_VDPInitCopy
 
-_Header_ControllerInit:                ; Set IN I/O direction, interrupts off, on all ports
+_Header_ControllerInit:         ; Set IN I/O direction, interrupts off, on all ports
     move.b #$00,CTRL_PORT_1     ; Controller port 1 CTRL
     move.b #$00,CTRL_PORT_2     ; Controller port 2 CTRL
     move.b #$00,CTRL_PORT_EXP   ; EXP port CTRL
@@ -224,10 +224,12 @@ Z80Data:
     dc.w $f3ed, $5636 
     dc.w $e9e9, $8104 
     dc.w $8f01 
+    even
 
 ; PSG Sample Program ----------------------------------------------------------- 
 PSGData: 
     dc.w $9fbf, $dfff 
+    even
 
 ; VDP Initial Values ----------------------------------------------------------- 
 VDPRegisters: 
@@ -255,6 +257,7 @@ VDPRegisters:
     dc.b $00 ; 21: DMA source address lo byte
     dc.b $00 ; 22: DMA source address mid byte
     dc.b $80 ; 23: DMA source address hi byte, memory-to-VRAM mode (bits 6-7)
+    even
 
 ; Includes ---------------------------------------------------------------------
 

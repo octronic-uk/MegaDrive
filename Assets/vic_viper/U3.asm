@@ -63,7 +63,7 @@ VicViper_U3_Tiles_Start:
 
 VicViper_U3_Tiles_End:
 
-    nop     0,8
+    even
 
 VicViper_U3_VRAM        equ VicViper_U2_VRAM_End
 VicViper_U3_SizeB       equ (VicViper_U3_Tiles_End-VicViper_U3_Tiles_Start) ; Sprite size in bytes

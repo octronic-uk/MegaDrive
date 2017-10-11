@@ -50,10 +50,12 @@ VDP_VSRAM_WRITE                  equ $05
 VDP_SPRITE_X_MIN                 equ $80
 VDP_SPRITE_X_MAX_32              equ $17F
 VDP_SPRITE_X_MAX_40              equ $1BF
+VDP_SPRITE_WIDTH                 equ VDP_SPRITE_X_MAX_40-VDP_SPRITE_X_MIN
 
 VDP_SPRITE_Y_MIN                 equ $80
 VDP_SPRITE_Y_MAX_32              equ $15F
 VDP_SPRITE_Y_MAX_40              equ $16F
+VDP_SPRITE_HEIGHT                equ VDP_SPRITE_Y_MAX_40-VDP_SPRITE_Y_MIN
 
 VDP_FIRST_SPRITE                 equ $60000003
 
