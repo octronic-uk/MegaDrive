@@ -15,14 +15,18 @@
     include "../Assets/pcb/pcb.asm"
     include "../Assets/vic_viper/vic_viper.asm"
     include "../Assets/projectile/projectile.asm"
-    include "../Intro/Intro.asm"
+    include "../Shmup/Intro.asm"
+    include "../Shmup/HUD.asm"
 
 __GameMain:
-    jsr     _Intro
+    jsr     _Shmup_Intro
+
+_Shmup_Setup:
     jsr     _Shmup_SetupBG
     jsr     _Shmup_Setup_VicViper
     jsr     _Shmup_Setup_Projectiles
     jsr     _Shmup_InitCounters
+    jsr     _Shmup_HUD_Setup
 
 _Shmup_Loop:
     jsr     CtrlReadPad1D0
@@ -221,7 +225,7 @@ _Shmup_HandleController_Buttons_Next:
     move.w  #TRUE,PROJECTILE_STRUCT_ACTIVE_W(a0)
     ; Update Position
     move.w  _Shmup_PlayerXPos_W,PROJECTILE_STRUCT_X_W(a0)
-    add.w   #PLAYER_WIDTH,PROJECTILE_STRUCT_X_W(a0)
+    add.w   #PLAYER_WIDTH/2,PROJECTILE_STRUCT_X_W(a0)
     move.w  _Shmup_PlayerYPos_W,PROJECTILE_STRUCT_Y_W(a0)
     add.w   #(PLAYER_HEIGHT/2)-4,PROJECTILE_STRUCT_Y_W(a0)
     move.w  #PROJECTILE_DEFAULT_VEL_X,PROJECTILE_STRUCT_X_VEL_W(a0)

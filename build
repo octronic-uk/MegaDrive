@@ -5,7 +5,7 @@ PROJECT=$1
 # File Extensions
 _ASM_EXT=asm
 _MD_ROM_EXT=bin
-_FLAGS="-no-opt -nosym -Fbin"
+_FLAGS="-no-opt -Fbin"
 
 echo "Building ${PROJECT}"
 
@@ -19,9 +19,7 @@ fi
 rm -rfv *.${_MD_ROM_EXT}
 
 echo
-vasmm68k-mot ${_FLAGS} \
-    -o ${PROJECT}.${_MD_ROM_EXT} \
-    ${PROJECT}.${_ASM_EXT}
+vasmm68k-mot ${_FLAGS} -o ${PROJECT}.${_MD_ROM_EXT} ${PROJECT}.${_ASM_EXT}
 
 BUILD_RESULT=$?
 

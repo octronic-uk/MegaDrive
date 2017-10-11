@@ -417,3 +417,60 @@ VDP_LoadSprite:
     move.l  d1,VDP_DATA_PORT
     ; OK, bye
     rts
+
+;   Usage
+;       move.w  #Y,-(sp)
+;       move.w  #SIZE,-(sp)
+;       move.w  #LINK,-(sp)
+;       move.w  #HYPP,-(sp)
+;       move.w  #FIRST_TILE,-(sp)
+;       move.w  #X_COORD,-(sp)
+;       pea     #TARGET_ADDRESS,-(sp)
+;       jsr     VDP_CreateSprite
+;       add.l   #VDP_LOAD_SPRITE_ALIGN,sp
+;   Uses
+;       d0,d1,a0
+
+VDP_CREATE_SPRITE_ALIGN         equ 28
+
+VDP_CREATE_SPRITE_Y             equ 28
+VDP_CREATE_SPRITE_SIZE          equ 24
+VDP_CREATE_SPRITE_LINK          equ 20
+VDP_CREATE_SPRITE_HVPP          equ 16
+VDP_CREATE_SPRITE_1ST_TILE      equ 12
+VDP_CREATE_SPRITE_X             equ 8
+VDP_CREATE_SPRITE_TGT_ADDRESS   equ 4
+
+VDP_CreateSprite:
+    ; Initialise Target
+    movea.l VDP_CREATE_SPRITE_TGT_ADDRESS(sp),a0 ; Put target address into a0 
+    clr.l   (a0)    ; Zero out target high long
+    clr.l   4(a0)   ; Zero out target low long
+    ; Y Coord
+    clr.l   d0      ; Work in d0
+    or.w    VDP_CREATE_SPRITE_Y(sp),d0 
+    swap    d0      ; Put in msb word
+    ; Size
+    clr.l   d1     ; Work in d1
+    or.w    VDP_CREATE_SPRITE_SIZE(sp),d1 ; Put size in d1
+    swap    d1      ; Move to byte 3
+    lsr.l   #8,d1   ; Move to byte 2
+    ; Next Sprite Link
+    or.w    VDP_CREATE_SPRITE_LINK(sp),d1 
+    ; Complete MSL
+    or.l    d1,d0 
+    move.l  d0,(a0) ; Put to RAM
+    ; HVPP
+    clr.l   d0
+    move.w  VDP_CREATE_SPRITE_HVPP(sp),d0
+    lsr.l   #8,d0 ; Move to MSB
+    ; First Tile
+    clr.l   d1
+    move.w  VDP_CREATE_SPRITE_1ST_TILE(sp),d1
+    swap    d1 ; Move to byte 3
+    or.l    d1,d0 ; Combine
+    ; X Coord
+    or.l    VDP_CREATE_SPRITE_X(sp),d0
+    move.l  d0,4(a0)
+    ; Done
+    rts
