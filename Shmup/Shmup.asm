@@ -12,9 +12,9 @@
   
 ; Includes
     include "../include/Header.asm"
-    include "../Assets/pcb/pcb.asm"
-    include "../Assets/vic_viper/vic_viper.asm"
-    include "../Assets/projectile/projectile.asm"
+    include "../Shmup/Assets/pcb/pcb.asm"
+    include "../Shmup/Assets/vic_viper/vic_viper.asm"
+    include "../Shmup/Assets/projectile/projectile.asm"
     include "../Shmup/Intro.asm"
     include "../Shmup/HUD.asm"
 
