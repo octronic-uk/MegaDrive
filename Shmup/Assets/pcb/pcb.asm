@@ -673,3 +673,31 @@ _PCB_DrawRow_Loop:
     cmp.l   a0,a1           ; Compare with limit
     bgt     _PCB_DrawRow_Loop ; Are we there yet?
     rts
+
+PCB_Load_Asset:
+    ; Load the palette
+    pea     PCB_Palette
+    move.l  #$0020,-(sp)
+    jsr     VDP_LoadPalette
+    addq.l  #VDP_LOAD_PALETTE_ALIGN,sp
+    ; Load Tiles
+    pea     PCB_TilesStart
+    move.l  #PCB_TilesSizeT,-(sp)
+    move.l  #PCB_TilesVRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    ; Draw onto Plane A 
+    move.l  #VDP_SCROLL_TABLE_A,-(sp)
+    jsr     PCB_DrawRow
+    addq.l  #4,sp
+    move.l  #VDP_SCROLL_TABLE_A+$400,-(sp)
+    jsr     PCB_DrawRow
+    addq.l  #4,sp
+    move.l  #VDP_SCROLL_TABLE_A+$800,-(sp)
+    jsr     PCB_DrawRow
+    addq.l  #4,sp
+    move.l  #VDP_SCROLL_TABLE_A+$C00,-(sp)
+    jsr     PCB_DrawRow
+    addq.l  #4,sp
+    rts
+

@@ -15,6 +15,7 @@
     include "../Shmup/Assets/pcb/pcb.asm"
     include "../Shmup/Assets/vic_viper/vic_viper.asm"
     include "../Shmup/Assets/projectile/projectile.asm"
+    include "../Shmup/Assets/explosion/explosion.asm"
     include "../Shmup/Intro.asm"
     include "../Shmup/HUD.asm"
 
@@ -25,6 +26,7 @@ _Shmup_Setup:
     jsr     _Shmup_SetupBG
     jsr     _Shmup_Setup_VicViper
     jsr     _Shmup_Setup_Projectiles
+    jsr     _Shmup_Setup_Explosion
     jsr     _Shmup_InitCounters
     jsr     _Shmup_HUD_Setup
 
@@ -319,30 +321,7 @@ _Shmup_Update_Player:
     rts
 
 _Shmup_SetupBG:
-    ; Load the palette
-    pea     PCB_Palette
-    move.l  #$0020,-(sp)
-    jsr     VDP_LoadPalette
-    addq.l  #VDP_LOAD_PALETTE_ALIGN,sp
-    ; Load Tiles
-    pea     PCB_TilesStart
-    move.l  #PCB_TilesSizeT,-(sp)
-    move.l  #PCB_TilesVRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Draw onto Plane A 
-    move.l  #VDP_SCROLL_TABLE_A,-(sp)
-    jsr     PCB_DrawRow
-    addq.l  #4,sp
-    move.l  #VDP_SCROLL_TABLE_A+$400,-(sp)
-    jsr     PCB_DrawRow
-    addq.l  #4,sp
-    move.l  #VDP_SCROLL_TABLE_A+$800,-(sp)
-    jsr     PCB_DrawRow
-    addq.l  #4,sp
-    move.l  #VDP_SCROLL_TABLE_A+$C00,-(sp)
-    jsr     PCB_DrawRow
-    addq.l  #4,sp
+    jsr     PCB_Load_Asset
     rts
 
 _Shmup_Setup_Projectiles:
@@ -390,72 +369,11 @@ _Shmup_Setup_Projectiles_Next_Load:
     rts
 
 _Shmup_Setup_VicViper:
-    ; Send Palette
-    pea     VicViper_Palette
-    move.l  #$0040,-(sp) 
-    jsr     VDP_LoadPalette
-    addq.l  #VDP_LOAD_PALETTE_ALIGN,sp
-    ; Send C Tiles
-    pea     VicViper_C_Tiles_Start
-    move.l  #VicViper_C_SizeT,-(sp)
-    move.l  #VicViper_C_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send D1 Tiles
-    pea     VicViper_D1_Tiles_Start
-    move.l  #VicViper_D1_SizeT,-(sp)
-    move.l  #VicViper_D1_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send D2 Tiles
-    pea     VicViper_D2_Tiles_Start
-    move.l  #VicViper_D2_SizeT,-(sp)
-    move.l  #VicViper_D2_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send D3 Tiles
-    pea     VicViper_D3_Tiles_Start
-    move.l  #VicViper_D3_SizeT,-(sp)
-    move.l  #VicViper_D3_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send D4 Tiles
-    pea     VicViper_D4_Tiles_Start
-    move.l  #VicViper_D4_SizeT,-(sp)
-    move.l  #VicViper_D4_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send U1 Tiles
-    pea     VicViper_U1_Tiles_Start
-    move.l  #VicViper_U1_SizeT,-(sp)
-    move.l  #VicViper_U1_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send U2 Tiles
-    pea     VicViper_U2_Tiles_Start
-    move.l  #VicViper_U2_SizeT,-(sp)
-    move.l  #VicViper_U2_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send U3 Tiles
-    pea     VicViper_U3_Tiles_Start
-    move.l  #VicViper_U3_SizeT,-(sp)
-    move.l  #VicViper_U3_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Send U4 Tiles
-    pea     VicViper_U4_Tiles_Start
-    move.l  #VicViper_U4_SizeT,-(sp)
-    move.l  #VicViper_U4_VRAM,-(sp)
-    jsr     VDP_LoadTiles
-    add.l   #VDP_LOAD_TILES_ALIGN,sp
-    ; Load Sprite Desc
-    pea     VicViper_C_SpriteDescriptor
-    move.w  #0,-(sp)
-    move.w  #1,-(sp)
-    jsr     VDP_LoadSprite
-    addq.l  #VDP_LOAD_SPRITE_ALIGN,sp
-    ; Return
+    jsr     VicViper_Load_Asset
+    rts
+
+_Shmup_Setup_Explosion:
+    jsr     Explosion_Load_Asset
     rts
 
 _Shmup_HScroll_W                equ RAM_START

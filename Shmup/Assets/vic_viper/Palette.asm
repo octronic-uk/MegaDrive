@@ -22,5 +22,7 @@ VicViper_Palette:
 	dc.w	$0aac	;	Color $c
 	dc.w	$08ce	;	Color $d
 	dc.w	$0cce	;	Color $e
+	dc.w	$0cce	;	Color $f
+VicViper_Palette_End:
 
     even    

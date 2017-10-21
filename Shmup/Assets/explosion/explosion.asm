@@ -1,4 +1,12 @@
-ExplosionPalette:
+;  ______   ______   __  __
+; /\  __ \ /\  ___\ /\ \_\ \
+; \ \  __ \\ \___  \\ \  __ \
+;  \ \_\ \_\\/\_____\\ \_\ \_\
+;   \/_/\/_/ \/_____/ \/_/\/_/
+;
+;      ash@octronic.co.uk
+
+Explosion_Palette:
 	dc.w	$0000	;	Color $0 is transparent (so the actual value doesn't matter)
 	dc.w	$0006	;	Color $1
 	dc.w	$002a	;	Color $2
@@ -8,7 +16,14 @@ ExplosionPalette:
 	dc.w	$00ae	;	Color $6
 	dc.w	$00ce	;	Color $7
 	dc.w	$0aee	;	Color $8
-ExplosionPaletteEnd:
+	dc.w	$0aee	;	Color $9
+	dc.w	$0aee	;	Color $a
+	dc.w	$0aee	;	Color $b
+	dc.w	$0aee	;	Color $c
+	dc.w	$0aee	;	Color $d
+	dc.w	$0aee	;	Color $e
+	dc.w	$0aee	;	Color $f
+Explosion_Palette_End:
 
     even
 
@@ -201,7 +216,7 @@ Explosion_Frame5_Start:
 	dc.l	$02001000
 	dc.l	$30200000
 	dc.l	$00000000
-Explosion_Frame5_Etart:
+Explosion_Frame5_End:
 
 Explosion_Frame6_Start:
 	dc.l	$00000000	;	Tile (col 10, row 0)
@@ -239,7 +254,7 @@ Explosion_Frame6_Start:
 	dc.l	$30002000
 	dc.l	$00000000
 	dc.l	$00000000
-Explosion_Frame6_Etart:
+Explosion_Frame6_End:
 
 Explosion_Frame7_Start:
 	dc.l	$00000000	;	Tile (col 12, row 0)
@@ -383,3 +398,86 @@ Explosion_Frame8_SizeT    equ (Explosion_Frame8_SizeB/32)          ; Sprite size
 Explosion_Frame8_TileID   equ (Explosion_Frame8_VRAM/32)           ; ID of first tile
 Explosion_Frame8_VRAM_End equ  Explosion_Frame8_VRAM+Explosion_Frame8_SizeB
 
+Explosion_Load_Asset:
+    jsr Explosion_Load_Palette
+    jsr Explosion_Load_Frame1
+    jsr Explosion_Load_Frame2
+    jsr Explosion_Load_Frame3
+    jsr Explosion_Load_Frame4
+    jsr Explosion_Load_Frame5
+    jsr Explosion_Load_Frame6
+    jsr Explosion_Load_Frame7
+    jsr Explosion_Load_Frame8
+    rts
+
+Explosion_Load_Palette:
+    ; Send Palette
+    pea     Explosion_Palette
+    move.l  #$0060,-(sp) 
+    jsr     VDP_LoadPalette
+    addq.l  #VDP_LOAD_PALETTE_ALIGN,sp
+    rts
+
+Explosion_Load_Frame1:
+    pea     Explosion_Frame1_Start
+    move.l  #Explosion_Frame1_SizeT,-(sp)
+    move.l  #Explosion_Frame1_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
+
+Explosion_Load_Frame2:
+    pea     Explosion_Frame2_Start
+    move.l  #Explosion_Frame2_SizeT,-(sp)
+    move.l  #Explosion_Frame2_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
+
+Explosion_Load_Frame3:
+    pea     Explosion_Frame3_Start
+    move.l  #Explosion_Frame3_SizeT,-(sp)
+    move.l  #Explosion_Frame3_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
+
+Explosion_Load_Frame4:
+    pea     Explosion_Frame4_Start
+    move.l  #Explosion_Frame4_SizeT,-(sp)
+    move.l  #Explosion_Frame4_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
+
+Explosion_Load_Frame5:
+    pea     Explosion_Frame5_Start
+    move.l  #Explosion_Frame5_SizeT,-(sp)
+    move.l  #Explosion_Frame5_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
+
+Explosion_Load_Frame6:
+    pea     Explosion_Frame6_Start
+    move.l  #Explosion_Frame6_SizeT,-(sp)
+    move.l  #Explosion_Frame6_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
+
+Explosion_Load_Frame7:
+    pea     Explosion_Frame7_Start
+    move.l  #Explosion_Frame7_SizeT,-(sp)
+    move.l  #Explosion_Frame7_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
+
+Explosion_Load_Frame8:
+    pea     Explosion_Frame8_Start
+    move.l  #Explosion_Frame8_SizeT,-(sp)
+    move.l  #Explosion_Frame8_VRAM,-(sp)
+    jsr     VDP_LoadTiles
+    add.l   #VDP_LOAD_TILES_ALIGN,sp
+    rts
