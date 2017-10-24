@@ -7,7 +7,30 @@
 ;
 ; Sega Megadrive ROM header and Initialisation.
 
-    
+; System Constants
+INITIAL_SP      equ $FFE000
+ROM_START       equ $000000
+RAM_START       equ $FF0000
+RAM_END         equ $FFFFFF
+SRAM_START      equ $000000
+SRAM_END        equ $000000
+RESET_BUTTON    equ $A1000C
+RESET_AUX       equ $A10008
+HW_VERSION      equ $A10001
+TMSS_SIG        equ $A14000
+CTRL_PORT_1     equ $A10009      
+CTRL_PORT_2     equ $A1000B      
+CTRL_PORT_EXP   equ $A1000D    
+SEGA_STR        equ 'SEGA'
+
+PSG_RAM_BASE    equ $00C00011
+
+Z80_BUSREQ      equ $00A11100
+Z80_RESET       equ $00A11200
+Z80_RAM_BASE    equ $00A00000
+Z80_BUS_ENABLE  equ $0100
+Z80_BUS_DISABLE equ $0000
+
 
 ; Exception Table --------------------------------------------------------------
 	dc.l   INITIAL_SP               ; Initial stack pointer value
@@ -266,7 +289,3 @@ VDPRegisters:
     include "../include/VDP.asm"
     include "../include/Text.asm"
     include "../include/Controller.asm"
-    include "../include/constants/ROMConstants.asm"
-    include "../include/constants/VDPConstants.asm"
-    include "../include/constants/Z80Constants.asm"
-    include "../include/constants/PSGConstants.asm"

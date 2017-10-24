@@ -687,15 +687,19 @@ PCB_Load_Asset:
     jsr     VDP_LoadTiles
     add.l   #VDP_LOAD_TILES_ALIGN,sp
     ; Draw onto Plane A 
-    move.l  #VDP_SCROLL_TABLE_A,-(sp)
-    jsr     PCB_DrawRow
-    addq.l  #4,sp
-    move.l  #VDP_SCROLL_TABLE_A+$400,-(sp)
-    jsr     PCB_DrawRow
-    addq.l  #4,sp
+    ; Row 0
+    ;move.l  #VDP_SCROLL_TABLE_A,-(sp)
+    ;jsr     PCB_DrawRow
+    ;addq.l  #4,sp
+    ; Row 1 
+    ;move.l  #VDP_SCROLL_TABLE_A+$400,-(sp)
+    ;jsr     PCB_DrawRow
+    ;addq.l  #4,sp
+    ; Row 2 
     move.l  #VDP_SCROLL_TABLE_A+$800,-(sp)
     jsr     PCB_DrawRow
     addq.l  #4,sp
+    ; Row 3 
     move.l  #VDP_SCROLL_TABLE_A+$C00,-(sp)
     jsr     PCB_DrawRow
     addq.l  #4,sp
